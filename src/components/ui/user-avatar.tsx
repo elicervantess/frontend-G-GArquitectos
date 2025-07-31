@@ -9,6 +9,9 @@ interface UserAvatarProps extends Omit<AvatarProps, 'name' | 'fallback'> {
 export function UserAvatar({ showName = false, ...props }: UserAvatarProps) {
   const { user } = useAuth()
   
+  // Debug para ver si el componente se re-renderiza con nuevos datos
+  console.log('🖼️ UserAvatar render - Profile image:', user?.profileImage)
+  
   if (!user) {
     return <Avatar {...props} />
   }
@@ -16,6 +19,7 @@ export function UserAvatar({ showName = false, ...props }: UserAvatarProps) {
   return (
     <Avatar 
       {...props} 
+      src={user.profileImage} // Usar la foto de perfil del usuario
       name={user.name}
       alt={showName ? user.name : `Avatar de ${user.name}`}
     />

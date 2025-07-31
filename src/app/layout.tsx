@@ -3,7 +3,6 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
 import { AuthProvider } from "@/contexts/AuthContext"
-import { TokenExpirationHandler } from "@/components/token-expiration-handler"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,7 +20,6 @@ export default function RootLayout({
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
-          <TokenExpirationHandler />
           <Navbar />
           <div className="pt-16 lg:pt-20">
             {children}

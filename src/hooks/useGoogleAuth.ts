@@ -42,10 +42,11 @@ export const useGoogleAuth = () => {
     }
   }, [])
 
-  const validateGoogleToken = useCallback(async (idToken: string): Promise<{ isValid: boolean; message: string; isNewUser: boolean }> => {
+  const validateGoogleToken = useCallback(async (idToken: string, mode: 'login' | 'register'): Promise<{ isValid: boolean; message: string; isNewUser: boolean; token?: string }> => {
     try {
       const requestDto: GoogleAuthRequestDto = {
-        token: idToken
+        token: idToken,
+        mode: mode // 🔑 Enviar el modo al backend
       }
 
       const response = await fetch('http://localhost:8080/auth/google', {
@@ -60,19 +61,23 @@ export const useGoogleAuth = () => {
         return { isValid: false, message: 'Error en la validación del token', isNewUser: false }
       }
 
-      const data: any = await response.json()
+      const data: GoogleAuthResponseDto = await response.json()
       
       // El backend retorna "valid" en lugar de "isValid"
-      const isValid = data.valid ?? data.isValid ?? false
+      const isValid = data.valid
       const message = data.message || ''
+      const jwtToken = data.token // El JWT generado por el backend
       
       // Determinar si es un usuario nuevo basado en el mensaje
       const isNewUser = message?.includes('registrado exitosamente') || false
       
+      console.log('🔑 Google Auth Response:', { isValid, message, hasToken: !!jwtToken, isNewUser, mode })
+      
       return { 
         isValid, 
         message, 
-        isNewUser 
+        isNewUser,
+        token: jwtToken
       }
     } catch (error) {
       console.error('Error validating Google token:', error)
@@ -122,18 +127,19 @@ export const useGoogleAuth = () => {
           }
 
           // Validar el token con el backend
-          const validationResult = await validateGoogleToken(idToken)
+          const validationResult = await validateGoogleToken(idToken, mode)
           if (!validationResult.isValid) {
             throw new Error(validationResult.message || 'Invalid token')
           }
 
-          // Emitir evento de éxito con información adicional
+          // Emitir evento de éxito con información adicional incluyendo el JWT
           window.dispatchEvent(new CustomEvent('googleAuthSuccess', {
             detail: { 
               user: userInfo, 
               mode,
               message: validationResult.message,
-              isNewUser: validationResult.isNewUser
+              isNewUser: validationResult.isNewUser,
+              jwtToken: validationResult.token // 🔑 Incluir el JWT del backend
             }
           }))
 

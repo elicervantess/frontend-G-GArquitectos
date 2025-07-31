@@ -66,4 +66,16 @@ export function getUserFromToken(token: string) {
     console.error('Error getting user from token:', error)
     return null
   }
+}
+
+export function createAuthHeaders(token: string) {
+  console.log('🔑 Creating auth headers with token:', token)
+  console.log('🔍 Token parts count:', token.split('.').length)
+  
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
 } 
+
+

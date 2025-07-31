@@ -84,11 +84,11 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   // Google OAuth event listeners
   useEffect(() => {
     const handleGoogleAuthSuccess = async (event: CustomEvent) => {
-      const { user, mode, message, isNewUser } = event.detail
+      const { user, mode, message, isNewUser, jwtToken } = event.detail
       
       try {
-        // Usar la nueva función unificada
-        const result = await handleGoogleAuth(user, isNewUser)
+        // Usar la nueva función unificada con JWT token
+        const result = await handleGoogleAuth(user, isNewUser, jwtToken)
 
         if (result.success) {
           // Mostrar mensaje apropiado según el caso

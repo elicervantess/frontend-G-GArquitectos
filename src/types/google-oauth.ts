@@ -18,11 +18,13 @@ export interface GoogleAuthResponse {
 
 export interface GoogleAuthRequestDto {
   token: string
+  mode: 'login' | 'register' // 🔑 Agregar modo para que el backend sepa la intención
 }
 
 export interface GoogleAuthResponseDto {
   valid: boolean // Cambiado de isValid a valid para compatibilidad con el backend
   message?: string // Campo opcional para mensajes de respuesta
+  token?: string // Campo para el JWT generado por el backend
 }
 
 export interface GoogleAuthResult {

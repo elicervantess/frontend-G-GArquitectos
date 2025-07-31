@@ -193,7 +193,6 @@ export function Navbar() {
                     >
                       {isAuthenticated ? (
                         <>
-
                           <div className="flex items-center justify-center gap-2.5 px-2.5 py-2 text-sm rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-900/20 dark:hover:to-slate-900/20 cursor-pointer transition-all duration-200 group">
                             <User className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
                             Mi Perfil

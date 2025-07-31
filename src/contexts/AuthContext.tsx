@@ -3,13 +3,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { decodeJWT, isTokenValid, getUserFromToken } from '@/lib/jwt'
 import { GoogleUser } from '@/types/google-oauth'
+import { useUserApi } from '@/hooks/useUserApi'
 
 interface User {
   id: string
   email: string
   name: string
   role: string
-  // Agregar más campos según tu backend
+  profileImage?: string // Agregamos la foto de perfil
 }
 
 // DTOs que coinciden con tu backend
@@ -34,10 +35,9 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, role?: string) => Promise<{ success: boolean; error?: string }>
   loginWithGoogle: (googleUser: GoogleUser) => Promise<{ success: boolean; error?: string }>
   registerWithGoogle: (googleUser: GoogleUser) => Promise<{ success: boolean; error?: string }>
-  handleGoogleAuth: (googleUser: GoogleUser, isNewUser?: boolean) => Promise<{ success: boolean; error?: string; isNewUser?: boolean; message?: string }>
+  handleGoogleAuth: (googleUser: GoogleUser, isNewUser?: boolean, jwtToken?: string) => Promise<{ success: boolean; error?: string; isNewUser?: boolean; message?: string }>
   logout: () => void
   logoutWithBackend: () => Promise<void>
-  refreshToken: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -46,6 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  
+  const { getCurrentUser: getCurrentUserFromApi } = useUserApi()
+
+  // Debug: Log cada vez que el usuario cambie
+  useEffect(() => {
+    console.log('🔄 User state updated:', {
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      role: user?.role,
+      profileImage: user?.profileImage ? 'HAS_IMAGE' : 'NO_IMAGE'
+    })
+  }, [user])
 
   // Verificar si hay sesión guardada al cargar
   useEffect(() => {
@@ -55,6 +68,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userData) {
         setToken(savedToken)
         setUser(userData)
+        
+        // Obtener datos completos del usuario desde el backend
+        getCurrentUserFromApi(savedToken)
+          .then(backendUserData => {
+            if (backendUserData) {
+              setUser({
+                id: backendUserData.id.toString(),
+                email: backendUserData.email,
+                name: backendUserData.fullName,
+                role: backendUserData.role,
+                profileImage: backendUserData.profileImage
+              })
+            }
+          })
+          .catch(error => {
+            console.log('Error obteniendo datos del usuario al cargar:', error)
+          })
       } else {
         localStorage.removeItem('token')
       }
@@ -116,6 +146,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(token)
       setUser(userData)
       localStorage.setItem('token', token)
+      
+      // Obtener datos completos del usuario desde el backend inmediatamente
+      try {
+        console.log('🔄 Obteniendo datos completos del usuario...')
+        const backendUserData = await getCurrentUserFromApi(token)
+        if (backendUserData) {
+          console.log('✅ Actualizando usuario con datos del backend:', backendUserData)
+          const updatedUser = {
+            id: backendUserData.id.toString(),
+            email: backendUserData.email,
+            name: backendUserData.fullName,
+            role: backendUserData.role,
+            profileImage: backendUserData.profileImage
+          }
+          console.log('👤 Nuevo objeto usuario a guardar:', updatedUser)
+          setUser(updatedUser)
+          console.log('✅ setUser ejecutado con profileImage:', updatedUser.profileImage)
+        }
+      } catch (error) {
+        console.log('Error obteniendo datos del usuario:', error)
+      }
       
       return { success: true }
     } catch (error) {
@@ -180,6 +231,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData)
       localStorage.setItem('token', token)
       
+      // Obtener datos completos del usuario desde el backend inmediatamente
+      try {
+        console.log('🔄 Obteniendo datos completos del usuario (register)...')
+        const backendUserData = await getCurrentUserFromApi(token)
+        if (backendUserData) {
+          console.log('✅ Actualizando usuario con datos del backend (register):', backendUserData)
+          setUser({
+            id: backendUserData.id.toString(),
+            email: backendUserData.email,
+            name: backendUserData.fullName,
+            role: backendUserData.role,
+            profileImage: backendUserData.profileImage
+          })
+        }
+      } catch (error) {
+        console.log('Error obteniendo datos del usuario (register):', error)
+      }
+      
       return { success: true }
     } catch (error) {
       console.error('Register error:', error)
@@ -225,8 +294,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true)
       
-      // Por ahora, simular el login con Google
-      // En el futuro, esto debería hacer una llamada al backend
+      // ⚠️ IMPORTANTE: Este Google OAuth necesita integrarse con el backend
+      // Por ahora, NO establecer token hasta que esté integrado con backend
+      console.warn('🚨 Google OAuth no está integrado con el backend aún')
+      
       const userData = {
         id: googleUser.id,
         email: googleUser.email,
@@ -234,12 +305,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: 'USER'
       }
 
-      // Simular token (en producción, el backend debería generar uno)
-      const mockToken = btoa(JSON.stringify(userData))
-      
-      setToken(mockToken)
+      // NO crear token simulado - esto causa el error en el backend
       setUser(userData)
-      localStorage.setItem('token', mockToken)
+      // NO guardar token hasta que esté integrado con backend
       
       return { success: true }
     } catch (error) {
@@ -254,8 +322,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true)
       
-      // Por ahora, simular el registro con Google
-      // En el futuro, esto debería hacer una llamada al backend
+      // ⚠️ IMPORTANTE: Este Google OAuth necesita integrarse con el backend
+      // Por ahora, NO establecer token hasta que esté integrado con backend
+      console.warn('🚨 Google OAuth no está integrado con el backend aún')
+      
       const userData = {
         id: googleUser.id,
         email: googleUser.email,
@@ -263,12 +333,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: 'USER'
       }
 
-      // Simular token (en producción, el backend debería generar uno)
-      const mockToken = btoa(JSON.stringify(userData))
-      
-      setToken(mockToken)
+      // NO crear token simulado - esto causa el error en el backend
       setUser(userData)
-      localStorage.setItem('token', mockToken)
+      // NO guardar token hasta que esté integrado con backend
       
       return { success: true }
     } catch (error) {
@@ -279,25 +346,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Nueva función unificada para manejar Google Auth
-  const handleGoogleAuth = async (googleUser: GoogleUser, isNewUser: boolean = false) => {
+  // Nueva función unificada para manejar Google Auth con JWT token
+  const handleGoogleAuth = async (googleUser: GoogleUser, isNewUser: boolean = false, jwtToken?: string) => {
     try {
       setIsLoading(true)
       
-      // Crear datos del usuario
-      const userData = {
-        id: googleUser.id,
-        email: googleUser.email,
-        name: googleUser.name,
-        role: 'USER'
+      if (!jwtToken) {
+        console.error('❌ No JWT token provided from Google Auth')
+        return { 
+          success: false, 
+          error: 'No se recibió token de autenticación',
+          isNewUser: false 
+        }
       }
 
-      // Simular token (en producción, el backend debería generar uno)
-      const mockToken = btoa(JSON.stringify(userData))
-      
-      setToken(mockToken)
+      // Verificar que el JWT token sea válido
+      const userData = getUserFromToken(jwtToken)
+      if (!userData) {
+        console.error('❌ Invalid JWT token from Google Auth')
+        return { 
+          success: false, 
+          error: 'Token de autenticación inválido',
+          isNewUser: false 
+        }
+      }
+
+      console.log('✅ Valid JWT token received from Google Auth:', { userData })
+
+      // Guardar token y usuario
+      setToken(jwtToken)
       setUser(userData)
-      localStorage.setItem('token', mockToken)
+      localStorage.setItem('token', jwtToken)
+      
+      // Obtener datos completos del usuario desde el backend inmediatamente
+      try {
+        console.log('🔄 Obteniendo datos completos del usuario de Google...')
+        const backendUserData = await getCurrentUserFromApi(jwtToken)
+        if (backendUserData) {
+          console.log('✅ Actualizando usuario de Google con datos del backend:', backendUserData)
+          const updatedUser = {
+            id: backendUserData.id.toString(),
+            email: backendUserData.email,
+            name: backendUserData.fullName,
+            role: backendUserData.role,
+            profileImage: backendUserData.profileImage // 🖼️ Imagen de perfil de Google
+          }
+          setUser(updatedUser)
+        }
+      } catch (apiError) {
+        console.warn('⚠️ Error obteniendo datos del usuario de Google, usando datos del token:', apiError)
+        // Continuar con los datos del token si falla la API
+      }
       
       return { 
         success: true, 
@@ -318,11 +417,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const refreshToken = async () => {
-    // Implementar refresh token si es necesario
-    console.log('Refresh token functionality')
-  }
-
   const value = {
     user,
     isLoading,
@@ -335,7 +429,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     handleGoogleAuth,
     logout,
     logoutWithBackend,
-    refreshToken,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
