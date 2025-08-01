@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { SearchInput } from "@/components/ui/search-input"
 import { AuthModal } from "@/components/auth/auth-modal"
 import { UserAvatar } from "@/components/ui/user-avatar"
+import ProfileModal from "@/components/profile-modal"
 import { useAuth } from "@/contexts/AuthContext"
 import { Menu, X, User, Settings, LogOut, LogIn, UserPlus, Building, Users } from "lucide-react"
 
@@ -16,6 +17,7 @@ export function Navbar() {
   const [isMounted, setIsMounted] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login")
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   const { user, isAuthenticated, logout, logoutWithBackend, token } = useAuth()
   
@@ -193,8 +195,11 @@ export function Navbar() {
                     >
                       {isAuthenticated ? (
                         <>
-                          <div className="flex items-center justify-center gap-2.5 px-2.5 py-2 text-sm rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-900/20 dark:hover:to-slate-900/20 cursor-pointer transition-all duration-200 group">
-                            <User className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                          <div 
+                            onClick={() => setIsProfileModalOpen(true)}
+                            className="flex items-center justify-center gap-2.5 px-2.5 py-2 text-sm rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 dark:hover:from-gray-900/20 dark:hover:to-slate-900/20 cursor-pointer transition-all duration-200 group"
+                          >
+                            <User className="w-4 h-4 text-gray-700 dark:text-gray-300 group-hover:scale-110 transition-transform duration-200" />
                             Mi Perfil
                           </div>
                           
@@ -323,13 +328,12 @@ export function Navbar() {
                 <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-2">
                   {isAuthenticated ? (
                     <>
-
                       <Button 
                         variant="outline" 
                         className="w-full justify-center"
                         onClick={() => {
+                          setIsProfileModalOpen(true)
                           setIsMobileMenuOpen(false)
-                          // Aquí puedes agregar navegación al perfil
                         }}
                       >
                         Mi Perfil
@@ -409,6 +413,12 @@ export function Navbar() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
+      />
+
+      {/* Profile Modal */}
+      <ProfileModal 
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
     </>
   )

@@ -11,6 +11,8 @@ interface User {
   name: string
   role: string
   profileImage?: string // Agregamos la foto de perfil
+  lastPasswordUpdate?: string // ISO timestamp para la última actualización de contraseña
+  provider?: string // Para identificar el método de autenticación
 }
 
 // DTOs que coinciden con tu backend
@@ -38,6 +40,7 @@ interface AuthContextType {
   handleGoogleAuth: (googleUser: GoogleUser, isNewUser?: boolean, jwtToken?: string) => Promise<{ success: boolean; error?: string; isNewUser?: boolean; message?: string }>
   logout: () => void
   logoutWithBackend: () => Promise<void>
+  updateUserProfile: (updatedUserData: any) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -78,7 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 email: backendUserData.email,
                 name: backendUserData.fullName,
                 role: backendUserData.role,
-                profileImage: backendUserData.profileImage
+                profileImage: backendUserData.profileImage,
+                lastPasswordUpdate: backendUserData.lastPasswordUpdate,
+                provider: backendUserData.profileImage?.includes('googleusercontent.com') ? 'GOOGLE' : 'EMAIL'
               })
             }
           })
@@ -158,7 +163,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: backendUserData.email,
             name: backendUserData.fullName,
             role: backendUserData.role,
-            profileImage: backendUserData.profileImage
+            profileImage: backendUserData.profileImage,
+            provider: backendUserData.profileImage?.includes('googleusercontent.com') ? 'GOOGLE' : 'EMAIL'
           }
           console.log('👤 Nuevo objeto usuario a guardar:', updatedUser)
           setUser(updatedUser)
@@ -242,7 +248,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: backendUserData.email,
             name: backendUserData.fullName,
             role: backendUserData.role,
-            profileImage: backendUserData.profileImage
+            profileImage: backendUserData.profileImage,
+            lastPasswordUpdate: backendUserData.lastPasswordUpdate,
+            provider: backendUserData.profileImage?.includes('googleusercontent.com') ? 'GOOGLE' : 'EMAIL'
           })
         }
       } catch (error) {
@@ -389,7 +397,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: backendUserData.email,
             name: backendUserData.fullName,
             role: backendUserData.role,
-            profileImage: backendUserData.profileImage // 🖼️ Imagen de perfil de Google
+            profileImage: backendUserData.profileImage, // 🖼️ Imagen de perfil de Google
+            provider: 'GOOGLE' // Los usuarios de Google siempre tienen provider GOOGLE
           }
           setUser(updatedUser)
         }
@@ -417,6 +426,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const updateUserProfile = (updatedUserData: any) => {
+    if (updatedUserData && user) {
+      console.log('🔄 Updating user profile in context:', updatedUserData)
+      setUser({
+        id: updatedUserData.id?.toString() || user.id,
+        email: updatedUserData.email || user.email,
+        name: updatedUserData.fullName || user.name,
+        role: updatedUserData.role || user.role,
+        profileImage: updatedUserData.profileImage || user.profileImage,
+        lastPasswordUpdate: updatedUserData.lastPasswordUpdate || user.lastPasswordUpdate,
+        provider: user.provider // Mantener el provider existente
+      })
+    }
+  }
+
   const value = {
     user,
     isLoading,
@@ -429,6 +453,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     handleGoogleAuth,
     logout,
     logoutWithBackend,
+    updateUserProfile,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

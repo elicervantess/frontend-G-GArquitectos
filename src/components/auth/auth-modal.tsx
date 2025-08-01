@@ -419,32 +419,6 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                           </motion.div>
                         )}
                       </div>
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Rol
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { value: "USER", label: "Usuario", icon: User },
-                            { value: "ARCHITECT", label: "Arquitecto", icon: Building },
-                            { value: "ADMIN", label: "Admin", icon: Crown }
-                          ].map((role) => (
-                            <Button
-                              key={role.value}
-                              type="button"
-                              variant={formData.role === role.value ? "default" : "outline"}
-                              size="sm"
-                              className="h-auto py-3 flex flex-col items-center gap-1 rounded-xl disabled:opacity-50 bg-gray-700 hover:bg-gray-800 data-[state=active]:bg-gray-700"
-                              onClick={() => handleInputChange("role", role.value)}
-                              disabled={isSubmitting || !!success}
-                            >
-                              <role.icon className="w-4 h-4" />
-                              <span className="text-xs">{role.label}</span>
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
                     </>
                   )}
 

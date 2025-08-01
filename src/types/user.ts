@@ -4,4 +4,6 @@ export interface UserResponseDto {
   email: string
   role: string
   profileImage: string
+  lastPasswordUpdate?: string // ISO timestamp
+  provider?: string // Para identificar si es usuario de Google
 }
