@@ -112,4 +112,30 @@ const SkeletonAvatar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 )
 SkeletonAvatar.displayName = "SkeletonAvatar"
 
-export { Loading, Skeleton, SkeletonText, SkeletonAvatar } 
+// Componente de skeleton para barra de progreso
+const SkeletonProgressBar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { 
+  height?: number
+  animated?: boolean 
+}>(
+  ({ className, height = 4, animated = true, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden", className)}
+      style={{ height: `${height}px` }}
+      {...props}
+    >
+      {animated && (
+        <div 
+          className="h-full bg-gradient-to-r from-blue-500 to-blue-600 animate-pulse"
+          style={{
+            animation: "shimmer 2s infinite linear",
+            background: "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent)",
+          }}
+        />
+      )}
+    </div>
+  )
+)
+SkeletonProgressBar.displayName = "SkeletonProgressBar"
+
+export { Loading, Skeleton, SkeletonText, SkeletonAvatar, SkeletonProgressBar } 

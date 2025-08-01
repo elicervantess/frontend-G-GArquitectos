@@ -1,5 +1,6 @@
 import { UserResponseDto } from '@/types/user'
 import { createAuthHeaders } from '@/lib/jwt'
+import { AuthInterceptor } from '@/lib/auth-interceptor'
 
 // Interfaces para los DTOs
 export interface UserRequestDto {
@@ -23,12 +24,21 @@ export interface ApiResponse<T> {
 
 export const useUserApi = () => {
   const getCurrentUser = async (token: string): Promise<UserResponseDto> => {
-    console.log('🔍 Calling /auth/me endpoint with token:', token?.substring(0, 20) + '...')
+    console.log('🔍 Calling /users/me endpoint with token:', token?.substring(0, 20) + '...')
     
-    const response = await fetch('http://localhost:8080/users/me', {
+    const response = await AuthInterceptor.fetch('http://localhost:8080/users/me', {
       method: 'GET',
       headers: createAuthHeaders(token)
     })
+    
+    // Si es 401 o 403, significa que el usuario fue eliminado o token inválido
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(`User not found or unauthorized: ${response.status}`)
+    }
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
     
     const data = await response.json()
     console.log('📦 Response from /users/me:', data)
@@ -45,7 +55,7 @@ export const useUserApi = () => {
     const requestBody = JSON.stringify(userRequestDto)
     console.log('📤 Request body (raw):', requestBody)
     
-    const response = await fetch('http://localhost:8080/users/edit/me', {
+    const response = await AuthInterceptor.fetch('http://localhost:8080/users/edit/me', {
       method: 'PUT',
       headers: {
         ...createAuthHeaders(token),
@@ -110,7 +120,7 @@ export const useUserApi = () => {
   const verifyPassword = async (email: string, password: string): Promise<boolean> => {
     console.log('🔐 Verifying password for email:', email)
     
-    const response = await fetch('http://localhost:8080/auth/verify-password', {
+    const response = await AuthInterceptor.fetch('http://localhost:8080/auth/verify-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -161,7 +171,7 @@ export const useUserApi = () => {
       const formData = new FormData()
       formData.append('profilePhoto', photoFile)
       
-      const response = await fetch(`http://localhost:8080/users/${userId}/profile-photo`, {
+      const response = await AuthInterceptor.fetch(`http://localhost:8080/users/${userId}/profile-photo`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -226,28 +236,26 @@ export const useUserApi = () => {
   }
 
   const removeProfilePhoto = async (token: string, userId: string): Promise<ApiResponse<UserResponseDto>> => {
-    console.log('🗑️ Removing profile photo for user:', userId)
+    console.log('🗑️ Removing profile photo for user (resetting to default):', userId)
     
     try {
-      // TEMPORAL: Usar PUT con FormData vacío para simular eliminación
-      // hasta que se implemente DELETE en el backend
+      // Usar el endpoint existente con parámetro resetToDefault
       const formData = new FormData()
-      // Enviar un marcador para indicar que queremos eliminar la foto
-      formData.append('removePhoto', 'true')
+      formData.append('resetToDefault', 'true')
       
-      const response = await fetch(`http://localhost:8080/users/${userId}/profile-photo`, {
+      const response = await AuthInterceptor.fetch(`http://localhost:8080/users/${userId}/profile-photo`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
-          // No establecer Content-Type, que FormData lo maneje automáticamente
+          // No establecer Content-Type para que FormData lo maneje
         },
         body: formData
       })
       
-      console.log('📡 Remove photo response status:', response.status, response.statusText)
+      console.log('📡 Reset photo response status:', response.status, response.statusText)
       
       if (!response.ok) {
-        let errorMessage = `Error al eliminar foto de perfil: ${response.status} ${response.statusText}`
+        let errorMessage = `Error al restablecer foto de perfil: ${response.status} ${response.statusText}`
         
         const contentType = response.headers.get('content-type')
         

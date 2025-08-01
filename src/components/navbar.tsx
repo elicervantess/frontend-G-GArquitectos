@@ -7,7 +7,10 @@ import { SearchInput } from "@/components/ui/search-input"
 import { AuthModal } from "@/components/auth/auth-modal"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import ProfileModal from "@/components/profile-modal"
+import TopLoadingBar from "@/components/ui/top-loading-bar"
+import GoogleImageStatus from "@/components/ui/google-image-status"
 import { useAuth } from "@/contexts/AuthContext"
+import { useGoogleAuth } from "@/hooks/useGoogleAuth"
 import { Menu, X, User, Settings, LogOut, LogIn, UserPlus, Building, Users } from "lucide-react"
 
 export function Navbar() {
@@ -18,8 +21,16 @@ export function Navbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login")
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [refreshImageKey, setRefreshImageKey] = useState(0)
 
   const { user, isAuthenticated, logout, logoutWithBackend, token } = useAuth()
+  const { isLoading: isGoogleAuthLoading } = useGoogleAuth()
+  
+  // Función para refrescar la imagen de perfil
+  const refreshProfileImage = () => {
+    setRefreshImageKey(prev => prev + 1)
+    console.log('🔄 Forzando refresh de imagen de perfil')
+  }
   
   // Debug: Log del estado de autenticación
   useEffect(() => {
@@ -117,6 +128,9 @@ export function Navbar() {
 
   return (
     <>
+      {/* Top Loading Bar */}
+      <TopLoadingBar isLoading={isGoogleAuthLoading} color="primary" height={3} />
+      
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -176,7 +190,12 @@ export function Navbar() {
                   onMouseEnter={() => setIsUserMenuOpen(true)}
                 >
                   {isAuthenticated ? (
-                    <UserAvatar size="sm" variant="primary" />
+                    <UserAvatar 
+                      key={refreshImageKey} 
+                      size="sm" 
+                      variant="primary" 
+                      autoRefresh={true}
+                    />
                   ) : (
                     <User className="w-4 h-4" />
                   )}
@@ -420,6 +439,15 @@ export function Navbar() {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
+
+      {/* Google Image Status Indicator */}
+      {isAuthenticated && user && (
+        <GoogleImageStatus
+          imageUrl={user.profileImage}
+          userName={user.name}
+          onRefresh={refreshProfileImage}
+        />
+      )}
     </>
   )
 } 

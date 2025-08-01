@@ -3,6 +3,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
 import { AuthProvider } from "@/contexts/AuthContext"
+import { UserDeletedNotification } from "@/components/user-deleted-notification"
+import { AutoLogoutNotification } from "@/components/auto-logout-notification"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,6 +22,8 @@ export default function RootLayout({
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
+          <UserDeletedNotification />
+          <AutoLogoutNotification />
           <Navbar />
           <div className="pt-16 lg:pt-20">
             {children}

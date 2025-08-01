@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { decodeJWT, isTokenValid, getUserFromToken } from '@/lib/jwt'
 import { GoogleUser } from '@/types/google-oauth'
 import { useUserApi } from '@/hooks/useUserApi'
+import { AuthInterceptor } from '@/lib/auth-interceptor'
 
 interface User {
   id: string
@@ -41,6 +42,7 @@ interface AuthContextType {
   logout: () => void
   logoutWithBackend: () => Promise<void>
   updateUserProfile: (updatedUserData: any) => void
+  verifyUserExists: (forceCheck?: boolean) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -49,8 +51,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [lastUserCheck, setLastUserCheck] = useState<number>(0)
   
   const { getCurrentUser: getCurrentUserFromApi } = useUserApi()
+
+  // Función para verificar si el usuario sigue existiendo
+  const verifyUserExists = async (forceCheck = false) => {
+    if (!token) return false
+    
+    // Solo verificar cada 30 segundos, a menos que se fuerce
+    const now = Date.now()
+    if (!forceCheck && (now - lastUserCheck) < 30000) {
+      return true
+    }
+
+    try {
+      const userData = await getCurrentUserFromApi(token)
+      if (userData) {
+        // Usuario existe, actualizar datos
+        setUser({
+          id: userData.id.toString(),
+          email: userData.email,
+          name: userData.fullName,
+          role: userData.role,
+          profileImage: userData.profileImage,
+          lastPasswordUpdate: userData.lastPasswordUpdate,
+          provider: userData.profileImage?.includes('googleusercontent.com') ? 'GOOGLE' : 'EMAIL'
+        })
+        setLastUserCheck(now)
+        return true
+      } else {
+        // Usuario no existe, hacer logout
+        console.log('👻 Usuario eliminado de la BD, haciendo logout automático')
+        handleUserDeleted()
+        return false
+      }
+    } catch (error: any) {
+      // Si es error 401/403, el usuario fue eliminado o token inválido
+      if (error.status === 401 || error.status === 403) {
+        console.log('🚫 Usuario no autorizado (probablemente eliminado), haciendo logout')
+        handleUserDeleted()
+        return false
+      }
+      // Otros errores, mantener sesión
+      console.error('Error verificando usuario:', error)
+      return true
+    }
+  }
+
+  // Función para manejar cuando un usuario fue eliminado
+  const handleUserDeleted = () => {
+    localStorage.removeItem('token')
+    setToken(null)
+    setUser(null)
+    // Opcional: mostrar notificación
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('userDeleted', {
+        detail: { message: 'Tu cuenta ha sido eliminada del sistema' }
+      }))
+    }
+  }
 
   // Debug: Log cada vez que el usuario cambie
   useEffect(() => {
@@ -63,6 +123,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [user])
 
+  // Registrar interceptor de autorización
+  useEffect(() => {
+    // Registrar la función de logout automático
+    AuthInterceptor.setLogoutCallback(() => {
+      console.log('🔐 Ejecutando logout automático por error de autorización')
+      logout()
+    })
+
+    // Limpiar el interceptor al desmontar
+    return () => {
+      AuthInterceptor.reset()
+    }
+  }, [])
+
   // Verificar si hay sesión guardada al cargar
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
@@ -72,24 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(savedToken)
         setUser(userData)
         
-        // Obtener datos completos del usuario desde el backend
-        getCurrentUserFromApi(savedToken)
-          .then(backendUserData => {
-            if (backendUserData) {
-              setUser({
-                id: backendUserData.id.toString(),
-                email: backendUserData.email,
-                name: backendUserData.fullName,
-                role: backendUserData.role,
-                profileImage: backendUserData.profileImage,
-                lastPasswordUpdate: backendUserData.lastPasswordUpdate,
-                provider: backendUserData.profileImage?.includes('googleusercontent.com') ? 'GOOGLE' : 'EMAIL'
-              })
-            }
-          })
-          .catch(error => {
-            console.log('Error obteniendo datos del usuario al cargar:', error)
-          })
+        // Verificar que el usuario sigue existiendo en el backend
+        verifyUserExists(true)
       } else {
         localStorage.removeItem('token')
       }
@@ -98,6 +156,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('token')
     }
     setIsLoading(false)
+  }, [])
+
+  // Verificación periódica del usuario (cada 2 minutos)
+  useEffect(() => {
+    if (!user || !token) return
+
+    const interval = setInterval(() => {
+      verifyUserExists()
+    }, 120000) // 2 minutos
+
+    return () => clearInterval(interval)
+  }, [user, token])
+
+  // Verificar usuario cuando la ventana recupera el foco
+  useEffect(() => {
+    if (!user || !token) return
+
+    const handleFocus = () => {
+      verifyUserExists(true)
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -454,6 +535,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout,
     logoutWithBackend,
     updateUserProfile,
+    verifyUserExists,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

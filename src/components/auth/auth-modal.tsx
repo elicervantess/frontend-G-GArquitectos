@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertWithIcon } from "@/components/ui/alert"
 import { Loading } from "@/components/ui/loading"
 import { Badge } from "@/components/ui/badge"
+import Toast from "@/components/ui/toast"
 import { useAuth } from "@/contexts/AuthContext"
 import { parseAuthError, translateAuthError } from "@/lib/auth-utils"
 import { useGoogleAuth } from "@/hooks/useGoogleAuth"
@@ -33,9 +34,21 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [success, setSuccess] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Toast state
+  const [toastVisible, setToastVisible] = useState(false)
+  const [toastMessage, setToastMessage] = useState("")
+  const [toastType, setToastType] = useState<"success" | "error" | "warning" | "info">("info")
 
   const { login, register, loginWithGoogle, registerWithGoogle, handleGoogleAuth } = useAuth()
   const { initiateGoogleAuth, isLoading: isGoogleLoading } = useGoogleAuth()
+  
+  // Toast helper function
+  const showToast = (message: string, type: "success" | "error" | "warning" | "info" = "info") => {
+    setToastMessage(message)
+    setToastType(type)
+    setToastVisible(true)
+  }
 
   // Función para reiniciar el estado del modal
   const resetModalState = () => {
@@ -86,6 +99,8 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
     const handleGoogleAuthSuccess = async (event: CustomEvent) => {
       const { user, mode, message, isNewUser, jwtToken } = event.detail
       
+      showToast("Procesando autenticación con Google...", "info")
+      
       try {
         // Usar la nueva función unificada con JWT token
         const result = await handleGoogleAuth(user, isNewUser, jwtToken)
@@ -97,9 +112,13 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
           if (!isNewUser && mode === 'register') {
             // Usuario existente intentando registrarse
             successMessage = 'Cuenta de Google con este correo ya fue registrada. Iniciando sesión...'
+            showToast("Usuario existente encontrado, iniciando sesión...", "success")
           } else if (isNewUser && mode === 'login') {
             // Usuario nuevo intentando hacer login
             successMessage = 'Usuario no encontrado. Registrando nueva cuenta...'
+            showToast("Nuevo usuario detectado, creando cuenta...", "success")
+          } else {
+            showToast("¡Autenticación exitosa!", "success")
           }
           
           setSuccess(successMessage)
@@ -108,14 +127,17 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
           }, 2000)
         } else {
           setErrors({ general: result.error || 'Error en la autenticación con Google' })
+          showToast("Error en la autenticación con Google", "error")
         }
       } catch (error) {
         setErrors({ general: 'Error en la autenticación con Google' })
+        showToast("Error de conexión con Google", "error")
       }
     }
 
     const handleGoogleAuthError = (event: CustomEvent) => {
       setErrors({ general: event.detail.error || 'Error en la autenticación con Google' })
+      showToast(event.detail.error || 'Error en la autenticación con Google', "error")
     }
 
     window.addEventListener('googleAuthSuccess', handleGoogleAuthSuccess as unknown as EventListener)
@@ -279,9 +301,11 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   const handleSocialAuth = async (provider: "apple" | "google") => {
     if (provider === "google") {
       try {
+        showToast("Abriendo ventana de autenticación de Google...", "info")
         initiateGoogleAuth(mode)
       } catch (error) {
         setErrors({ general: 'Error al abrir la ventana de autenticación de Google' })
+        showToast("Error al abrir la ventana de Google", "error")
       }
     } else {
       console.log('🍎 Procesando Apple auth...')
@@ -316,37 +340,42 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
-          onClick={() => {
-            onClose()
-            resetModalState()
-          }}
-        >
+    <>
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative w-full max-w-lg mx-auto"
-            onClick={(e) => e.stopPropagation()}
+            key="auth-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+            onClick={() => {
+              onClose()
+              resetModalState()
+            }}
           >
+            <motion.div
+              key="auth-modal-content"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-lg mx-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
             <Card variant="glass" className="relative overflow-hidden border-0 shadow-2xl">
               {/* Background Pattern */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-50/80 via-slate-100/80 to-zinc-100/80 dark:from-gray-900/80 dark:via-slate-800/80 dark:to-zinc-900/80" />
               
               {/* Floating Elements */}
               <motion.div
+                key="floating-element-1"
                 className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-gray-400 to-slate-500 rounded-full opacity-20"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
+                key="floating-element-2"
                 className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-slate-500 to-zinc-600 rounded-full opacity-20"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -405,6 +434,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                         />
                         {errors.name && (
                           <motion.div
+                            key="name-error"
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.2 }}
@@ -438,6 +468,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                     />
                     {errors.email && (
                       <motion.div
+                        key="email-error"
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.2 }}
@@ -481,6 +512,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                     />
                     {errors.password && (
                       <motion.div
+                        key="password-error"
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.2 }}
@@ -499,6 +531,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                   {/* Success Alert */}
                   {success && (
                     <motion.div
+                      key="success-alert"
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.3 }}
@@ -572,7 +605,12 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                     disabled={isSubmitting || isGoogleLoading || !!success}
                   >
                     {isSubmitting || isGoogleLoading ? (
-                      <Loading size="sm" />
+                      <div className="flex items-center justify-center">
+                        <Loading size="sm" />
+                        <span className="ml-2 text-sm">
+                          {mode === "login" ? "Iniciando sesión..." : "Registrando cuenta..."}
+                        </span>
+                      </div>
                     ) : (
                       <>
                         <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
@@ -624,6 +662,17 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+      
+      {/* Toast Notification */}
+      <Toast 
+        isVisible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onClose={() => setToastVisible(false)}
+        position="top-center"
+        duration={3000}
+      />
+    </>
   )
 } 

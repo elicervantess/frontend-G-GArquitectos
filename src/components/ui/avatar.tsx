@@ -42,8 +42,34 @@ export interface AvatarProps
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ className, size, variant, src, alt, fallback, name, children, ...props }, ref) => {
     const [imageError, setImageError] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(!!src)
+    const [retryCount, setRetryCount] = React.useState(0)
+    const maxRetries = 3
     
-    const shouldShowFallback = !src || imageError
+    // Reset states when src changes
+    React.useEffect(() => {
+      if (src) {
+        setImageError(false)
+        setIsLoading(true)
+        setRetryCount(0)
+      }
+    }, [src])
+    
+    // Retry loading image after error (useful for Google profile images that might not be ready yet)
+    React.useEffect(() => {
+      if (imageError && retryCount < maxRetries && src) {
+        const timer = setTimeout(() => {
+          console.log(`🔄 Reintentando cargar imagen (intento ${retryCount + 1}/${maxRetries}):`, src)
+          setImageError(false)
+          setIsLoading(true)
+          setRetryCount(prev => prev + 1)
+        }, (retryCount + 1) * 2000) // 2s, 4s, 6s delays
+        
+        return () => clearTimeout(timer)
+      }
+    }, [imageError, retryCount, src, maxRetries])
+    
+    const shouldShowFallback = (!src || imageError) && !isLoading
     
     // Generar iniciales si se proporciona un nombre
     const initials = name ? generateInitials(name) : null
@@ -57,19 +83,42 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     
     const fallbackContent = getFallbackContent()
     
+    const handleImageLoad = () => {
+      console.log('✅ Imagen de perfil cargada exitosamente:', src)
+      setIsLoading(false)
+      setImageError(false)
+    }
+    
+    const handleImageError = () => {
+      console.log('❌ Error al cargar imagen de perfil:', src)
+      setIsLoading(false)
+      setImageError(true)
+    }
+    
     return (
       <div
         ref={ref}
         className={cn(avatarVariants({ size, variant }), className)}
         {...props}
       >
-        {!shouldShowFallback && (
+        {src && !imageError && (
           <img
             src={src}
             alt={alt}
-            className="aspect-square h-full w-full object-cover"
-            onError={() => setImageError(true)}
+            className={cn(
+              "aspect-square h-full w-full object-cover transition-opacity duration-300",
+              isLoading ? "opacity-0" : "opacity-100"
+            )}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
+        )}
+        
+        {/* Loading state */}
+        {isLoading && (
+          <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300" />
+          </div>
         )}
         
         {shouldShowFallback && (

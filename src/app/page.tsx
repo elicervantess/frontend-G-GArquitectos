@@ -8,6 +8,9 @@ import { UIShowcase } from "@/components/ui-showcase"
 import { UserAvatarDemo } from "@/components/user-avatar-demo"
 import { AuthModalDemo } from "@/components/auth-modal-demo"
 import { AuthErrorDemo } from "@/components/auth-error-demo"
+import { LoadingStatesDemo } from "@/components/loading-states-demo"
+import { AuthInterceptorDemo } from "@/components/auth-interceptor-demo"
+import { UserValidationDemo } from "@/components/user-validation-demo"
 
 export default function Home() {
   const [open, setOpen] = useState(false)
@@ -131,6 +134,20 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Loading States Demo Section */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LoadingStatesDemo />
+        </div>
+      </section>
+
+      {/* User Validation Demo Section */}
+      <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <UserValidationDemo />
+        </div>
+      </section>
+
       {/* Auth Error Demo Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-red-50 dark:from-gray-900 dark:to-red-900/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,8 +169,15 @@ export default function Home() {
           <AuthErrorDemo />
           
           {/* Componente de prueba temporal eliminado porque 'AuthErrorTest' no está definido */}
-          </div>
-        </section>
+        </div>
+      </section>
+
+      {/* Auth Interceptor Demo Section */}
+      <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AuthInterceptorDemo />
+        </div>
+      </section>
 
       {/* Google Config Checker Section */}
       <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
