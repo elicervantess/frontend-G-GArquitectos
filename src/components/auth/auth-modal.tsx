@@ -10,7 +10,9 @@ import { AlertWithIcon } from "@/components/ui/alert"
 import { Loading } from "@/components/ui/loading"
 import { Badge } from "@/components/ui/badge"
 import Toast from "@/components/ui/toast"
+import { EmailVerificationModal } from "./email-verification-modal"
 import { useAuth } from "@/contexts/AuthContext"
+import { useEmailVerification } from "@/hooks/useEmailVerification"
 import { parseAuthError, translateAuthError } from "@/lib/auth-utils"
 import { useGoogleAuth } from "@/hooks/useGoogleAuth"
 import { GoogleUser } from "@/types/google-oauth"
@@ -35,6 +37,10 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   const [success, setSuccess] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   
+  // Email verification states
+  const [showEmailVerification, setShowEmailVerification] = useState(false)
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState("")
+  
   // Toast state
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
@@ -42,6 +48,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
   const { login, register, loginWithGoogle, registerWithGoogle, handleGoogleAuth } = useAuth()
   const { initiateGoogleAuth, isLoading: isGoogleLoading } = useGoogleAuth()
+  const { registerWithVerification, resendVerificationCode } = useEmailVerification()
   
   // Toast helper function
   const showToast = (message: string, type: "success" | "error" | "warning" | "info" = "info") => {
@@ -191,33 +198,51 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
       let result
       if (mode === "login") {
         result = await login(formData.email, formData.password)
-      } else {
-        result = await register(formData.name, formData.email, formData.password, formData.role)
-      }
-
-      if (result.success) {
-        // Mostrar mensaje de éxito y mantener modal abierto
-        setSuccess(mode === "login" ? "¡Inicio de sesión exitoso!" : "¡Registro exitoso!")
-        setIsSubmitting(false)
         
-        // Cerrar modal después de mostrar el mensaje de éxito
-        setTimeout(() => {
-          onClose()
-        }, 2000)
-      } else {
-        // El backend envía mensajes de error específicos
-        const errorMessage = result.error || "Error desconocido"
-        
-        // Parsear el error para determinar el campo y traducir el mensaje
-        const parsedError = parseAuthError(errorMessage)
-        const translatedMessage = translateAuthError(errorMessage)
-        
-        if (parsedError.field === 'email') {
-          setErrors({ email: translatedMessage })
-        } else if (parsedError.field === 'password') {
-          setErrors({ password: translatedMessage })
+        if (result.success) {
+          setSuccess("¡Inicio de sesión exitoso!")
+          setIsSubmitting(false)
+          
+          setTimeout(() => {
+            onClose()
+          }, 2000)
         } else {
-          setErrors({ general: translatedMessage })
+          const errorMessage = result.error || "Error desconocido"
+          const parsedError = parseAuthError(errorMessage)
+          const translatedMessage = translateAuthError(errorMessage)
+          
+          if (parsedError.field === 'email') {
+            setErrors({ email: translatedMessage })
+          } else if (parsedError.field === 'password') {
+            setErrors({ password: translatedMessage })
+          } else {
+            setErrors({ general: translatedMessage })
+          }
+        }
+      } else {
+        // Registro con verificación de email
+        result = await registerWithVerification({
+          fullName: formData.name,
+          email: formData.email,
+          password: formData.password
+        })
+
+        if (result.success) {
+          setPendingVerificationEmail(formData.email)
+          setShowEmailVerification(true)
+          showToast("Código de verificación enviado a tu email", "success")
+        } else {
+          const errorMessage = result.message || "Error desconocido"
+          const parsedError = parseAuthError(errorMessage)
+          const translatedMessage = translateAuthError(errorMessage)
+          
+          if (parsedError.field === 'email') {
+            setErrors({ email: translatedMessage })
+          } else if (parsedError.field === 'password') {
+            setErrors({ password: translatedMessage })
+          } else {
+            setErrors({ general: translatedMessage })
+          }
         }
       }
     } catch (error) {
@@ -663,6 +688,27 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
         </motion.div>
       )}
       </AnimatePresence>
+      
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isOpen={showEmailVerification}
+        onClose={() => {
+          setShowEmailVerification(false)
+          setPendingVerificationEmail("")
+        }}
+        email={pendingVerificationEmail}
+        onVerificationSuccess={(token) => {
+          setShowEmailVerification(false)
+          setPendingVerificationEmail("")
+          onClose()
+          showToast("¡Cuenta verificada e iniciada exitosamente!", "success")
+        }}
+        onBackToRegister={() => {
+          setShowEmailVerification(false)
+          setPendingVerificationEmail("")
+          setMode("register")
+        }}
+      />
       
       {/* Toast Notification */}
       <Toast 

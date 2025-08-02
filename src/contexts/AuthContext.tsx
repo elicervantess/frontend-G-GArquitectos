@@ -35,6 +35,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   token: string | null
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  loginWithToken: (token: string, userData: any) => Promise<{ success: boolean; error?: string }>
   register: (name: string, email: string, password: string, role?: string) => Promise<{ success: boolean; error?: string }>
   loginWithGoogle: (googleUser: GoogleUser) => Promise<{ success: boolean; error?: string }>
   registerWithGoogle: (googleUser: GoogleUser) => Promise<{ success: boolean; error?: string }>
@@ -259,6 +260,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Login error:', error)
       return { success: false, error: 'Error de conexión' }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loginWithToken = async (jwtToken: string, userData: any) => {
+    try {
+      setIsLoading(true)
+      
+      // Validar token
+      if (!jwtToken) {
+        return { success: false, error: 'Token no proporcionado' }
+      }
+
+      // Guardar token y usuario
+      setToken(jwtToken)
+      localStorage.setItem('token', jwtToken)
+      
+      // Crear objeto usuario
+      const user: User = {
+        id: userData.id?.toString() || 'unknown',
+        email: userData.email || '',
+        name: userData.name || userData.fullName || '',
+        role: userData.role || 'USER',
+        profileImage: userData.profileImage,
+        provider: userData.provider || 'EMAIL'
+      }
+      
+      setUser(user)
+      
+      return { success: true }
+    } catch (error) {
+      console.error('LoginWithToken error:', error)
+      return { success: false, error: 'Error al procesar el token' }
     } finally {
       setIsLoading(false)
     }
@@ -528,6 +563,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user,
     token,
     login,
+    loginWithToken,
     register,
     loginWithGoogle,
     registerWithGoogle,
