@@ -11,6 +11,7 @@ import { Loading } from "@/components/ui/loading"
 import { Badge } from "@/components/ui/badge"
 import Toast from "@/components/ui/toast"
 import { EmailVerificationModal } from "./email-verification-modal"
+import { ForgotPasswordModal } from "./forgot-password-modal"
 import { useAuth } from "@/contexts/AuthContext"
 import { useEmailVerification } from "@/hooks/useEmailVerification"
 import { parseAuthError, translateAuthError } from "@/lib/auth-utils"
@@ -30,6 +31,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     role: "USER"
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -40,6 +42,9 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   // Email verification states
   const [showEmailVerification, setShowEmailVerification] = useState(false)
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState("")
+  
+  // Forgot password states
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   
   // Toast state
   const [toastVisible, setToastVisible] = useState(false)
@@ -59,7 +64,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
   // Función para reiniciar el estado del modal
   const resetModalState = () => {
-    setFormData({ name: "", email: "", password: "", role: "USER" })
+    setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "USER" })
     setErrors({})
     setTouched({})
     setSuccess("")
@@ -70,7 +75,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
 
   // Reset form when mode changes
   useEffect(() => {
-    setFormData({ name: "", email: "", password: "", role: "USER" })
+    setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "USER" })
     setErrors({})
     setTouched({})
     setSuccess("")
@@ -85,7 +90,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode)
-      setFormData({ name: "", email: "", password: "", role: "USER" })
+      setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "USER" })
       setErrors({})
       setTouched({})
       setSuccess("")
@@ -177,6 +182,15 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
       newErrors.password = "La contraseña es requerida"
     } else if (formData.password.length < 6) {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres"
+    }
+
+    // Validación de confirmación de contraseña solo en modo registro
+    if (mode === "register") {
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = "Debes confirmar tu contraseña"
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Las contraseñas no coinciden"
+      }
     }
 
     return newErrors
@@ -295,6 +309,22 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
       } else if (mode === "register" && field === "name") {
         setErrors(prev => ({ ...prev, name: "" }))
       }
+      
+      // Validación en tiempo real para confirmar contraseña
+      if (mode === "register" && field === "confirmPassword" && value === "") {
+        setErrors(prev => ({ ...prev, confirmPassword: "Debes confirmar tu contraseña" }))
+      } else if (mode === "register" && field === "confirmPassword" && value !== "" && formData.password !== value) {
+        setErrors(prev => ({ ...prev, confirmPassword: "Las contraseñas no coinciden" }))
+      } else if (mode === "register" && field === "confirmPassword") {
+        setErrors(prev => ({ ...prev, confirmPassword: "" }))
+      }
+      
+      // También validar confirmPassword cuando se cambia password
+      if (mode === "register" && field === "password" && formData.confirmPassword !== "" && formData.confirmPassword !== value) {
+        setErrors(prev => ({ ...prev, confirmPassword: "Las contraseñas no coinciden" }))
+      } else if (mode === "register" && field === "password" && formData.confirmPassword !== "" && formData.confirmPassword === value) {
+        setErrors(prev => ({ ...prev, confirmPassword: "" }))
+      }
     }
   }
 
@@ -321,24 +351,22 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
     } else if (mode === "register" && field === "name" && value.trim() !== "" && value.trim().length < 2) {
       setErrors(prev => ({ ...prev, name: "El nombre debe tener al menos 2 caracteres" }))
     }
+    
+    // Validación para confirmar contraseña en onBlur
+    if (mode === "register" && field === "confirmPassword" && value === "") {
+      setErrors(prev => ({ ...prev, confirmPassword: "Debes confirmar tu contraseña" }))
+    } else if (mode === "register" && field === "confirmPassword" && value !== "" && formData.password !== value) {
+      setErrors(prev => ({ ...prev, confirmPassword: "Las contraseñas no coinciden" }))
+    }
   }
 
-  const handleSocialAuth = async (provider: "apple" | "google") => {
-    if (provider === "google") {
-      try {
-        showToast("Abriendo ventana de autenticación de Google...", "info")
-        initiateGoogleAuth(mode)
-      } catch (error) {
-        setErrors({ general: 'Error al abrir la ventana de autenticación de Google' })
-        showToast("Error al abrir la ventana de Google", "error")
-      }
-    } else {
-      console.log('🍎 Procesando Apple auth...')
-      setIsSubmitting(true)
-      setTimeout(() => {
-        setIsSubmitting(false)
-        console.log(`${provider} auth clicked`)
-      }, 2000)
+  const handleGoogleAuthClick = async () => {
+    try {
+      showToast("Abriendo ventana de autenticación de Google...", "info")
+      initiateGoogleAuth(mode)
+    } catch (error) {
+      setErrors({ general: 'Error al abrir la ventana de autenticación de Google' })
+      showToast("Error al abrir la ventana de Google", "error")
     }
   }
 
@@ -551,7 +579,68 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                         />
                       </motion.div>
                     )}
+                    
+                    {/* Forgot Password link - Solo en modo login */}
+                    {mode === "login" && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotPassword(true)}
+                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium transition-colors"
+                          disabled={isSubmitting || !!success}
+                        >
+                          ¿Olvidaste tu contraseña?
+                        </button>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Campo de Confirmar Contraseña - Solo en modo registro */}
+                  {mode === "register" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Confirmar Contraseña
+                      </label>
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                        onBlur={() => handleInputBlur("confirmPassword")}
+                        placeholder="••••••••"
+                        leftIcon={<Lock className="w-4 h-4" />}
+                        rightIcon={
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="hover:bg-transparent"
+                            disabled={isSubmitting || !!success}
+                          >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </Button>
+                        }
+                        required
+                        disabled={isSubmitting || !!success}
+                      />
+                      {errors.confirmPassword && (
+                        <motion.div
+                          key="confirmPassword-error"
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <AlertWithIcon
+                            variant="destructive"
+                            title="Error"
+                            description={errors.confirmPassword}
+                            showClose
+                            onClose={() => setErrors(prev => ({ ...prev, confirmPassword: "" }))}
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Success Alert */}
                   {success && (
@@ -626,7 +715,7 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                   <Button
                     variant="outline"
                     className="w-full h-12 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl transition-all duration-300 hover:shadow-md disabled:opacity-50"
-                    onClick={() => handleSocialAuth("google")}
+                    onClick={handleGoogleAuthClick}
                     disabled={isSubmitting || isGoogleLoading || !!success}
                   >
                     {isSubmitting || isGoogleLoading ? (
@@ -645,25 +734,6 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
                           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                         </svg>
                         {mode === "login" ? "Iniciar sesión con Google" : "Registrarse con Google"}
-                      </>
-                    )}
-                  </Button>
-
-                  {/* Apple Auth Button */}
-                  <Button
-                    variant="outline"
-                    className="w-full h-12 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl transition-all duration-300 hover:shadow-md disabled:opacity-50"
-                    onClick={() => handleSocialAuth("apple")}
-                    disabled={isSubmitting || isGoogleLoading || !!success}
-                  >
-                    {isSubmitting ? (
-                      <Loading size="sm" />
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                        </svg>
-                        {mode === "login" ? "Iniciar sesión con Apple" : "Registrarse con Apple"}
                       </>
                     )}
                   </Button>
@@ -707,6 +777,20 @@ export function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalP
           setShowEmailVerification(false)
           setPendingVerificationEmail("")
           setMode("register")
+        }}
+      />
+      
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onBackToLogin={() => {
+          setShowForgotPassword(false)
+          setMode("login")
+        }}
+        onCloseAllModals={() => {
+          setShowForgotPassword(false)
+          onClose() // Cerrar el modal principal también
         }}
       />
       

@@ -34,7 +34,13 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, size, leftIcon, rightIcon, ...props }, ref) => {
+  ({ className, variant, size, leftIcon, rightIcon, value, ...props }, ref) => {
+    // Asegurar que el input siempre sea controlado o no controlado consistentemente
+    const inputProps = {
+      ...props,
+      ...(value !== undefined ? { value: value || '' } : {}),
+    }
+
     return (
       <div className="relative">
         {leftIcon && (
@@ -50,7 +56,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className
           )}
           ref={ref}
-          {...props}
+          {...inputProps}
         />
         {rightIcon && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">

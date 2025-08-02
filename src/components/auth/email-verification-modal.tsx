@@ -30,7 +30,7 @@ export function EmailVerificationModal({
   const [canResend, setCanResend] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null))
   
-  const { verifyEmail, resendVerificationCode, isLoading, error } = useEmailVerification()
+  const { verifyEmail, resendVerificationCode, clearError, isLoading, error } = useEmailVerification()
   // Countdown timer para reenvío
   useEffect(() => {
     if (isOpen && timeLeft > 0) {
@@ -56,6 +56,13 @@ export function EmailVerificationModal({
       }, 200)
     }
   }, [isOpen])
+
+  // Limpiar errores cuando se cierra el modal
+  useEffect(() => {
+    if (!isOpen) {
+      clearError()
+    }
+  }, [isOpen, clearError])
 
   const handleCodeChange = (index: number, value: string) => {
     if (value.length > 1) return // Solo un dígito por input

@@ -51,7 +51,7 @@ export function AuthModalDemo() {
     {
       icon: Smartphone,
       title: "Autenticación Social",
-      description: "Inicio de sesión con Google y Apple para una experiencia más fluida."
+      description: "Inicio de sesión con Google para una experiencia más fluida."
     },
     {
       icon: Globe,
@@ -63,7 +63,7 @@ export function AuthModalDemo() {
   const benefits = [
     "Validación de formularios en tiempo real",
     "Manejo inteligente de errores del servidor",
-    "Autenticación social con Google y Apple",
+    "Autenticación social con Google",
     "Interfaz moderna con animaciones suaves",
     "Soporte para múltiples roles de usuario",
     "Diseño accesible y responsive"

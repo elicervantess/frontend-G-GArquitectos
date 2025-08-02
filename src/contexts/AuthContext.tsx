@@ -274,21 +274,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'Token no proporcionado' }
       }
 
-      // Guardar token y usuario
+      // Guardar token
       setToken(jwtToken)
       localStorage.setItem('token', jwtToken)
       
-      // Crear objeto usuario
+      // Crear objeto usuario con datos completos
       const user: User = {
-        id: userData.id?.toString() || 'unknown',
+        id: userData.id?.toString() || userData.sub?.toString() || 'unknown',
         email: userData.email || '',
-        name: userData.name || userData.fullName || '',
+        name: userData.name || userData.fullName || userData.displayName || '',
         role: userData.role || 'USER',
-        profileImage: userData.profileImage,
-        provider: userData.provider || 'EMAIL'
+        profileImage: userData.profileImage || userData.profileImageUrl || userData.picture,
+        provider: userData.provider || 'EMAIL',
+        lastPasswordUpdate: userData.lastPasswordUpdate
       }
       
+      console.log('👤 Usuario creado con imagen:', user.profileImage)
+      
+      // Actualizar estado del usuario inmediatamente
       setUser(user)
+      
+      // Forzar una re-renderización
+      setTimeout(() => {
+        setUser(prevUser => ({ ...prevUser!, ...user }))
+      }, 0)
       
       return { success: true }
     } catch (error) {
@@ -508,6 +517,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const backendUserData = await getCurrentUserFromApi(jwtToken)
         if (backendUserData) {
           console.log('✅ Actualizando usuario de Google con datos del backend:', backendUserData)
+          console.log('🖼️ URL de imagen recibida del backend:', backendUserData.profileImage)
+          
           const updatedUser = {
             id: backendUserData.id.toString(),
             email: backendUserData.email,
@@ -516,7 +527,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             profileImage: backendUserData.profileImage, // 🖼️ Imagen de perfil de Google
             provider: 'GOOGLE' // Los usuarios de Google siempre tienen provider GOOGLE
           }
+          
           setUser(updatedUser)
+          console.log('✅ Usuario actualizado con imagen:', updatedUser.profileImage)
         }
       } catch (apiError) {
         console.warn('⚠️ Error obteniendo datos del usuario de Google, usando datos del token:', apiError)

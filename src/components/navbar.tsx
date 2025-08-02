@@ -5,10 +5,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { SearchInput } from "@/components/ui/search-input"
 import { AuthModal } from "@/components/auth/auth-modal"
-import { UserAvatar } from "@/components/ui/user-avatar"
+import { ImmediateAvatar } from "@/components/ui/immediate-avatar"
 import ProfileModal from "@/components/profile-modal"
 import TopLoadingBar from "@/components/ui/top-loading-bar"
-import GoogleImageStatus from "@/components/ui/google-image-status"
 import { useAuth } from "@/contexts/AuthContext"
 import { useGoogleAuth } from "@/hooks/useGoogleAuth"
 import { Menu, X, User, Settings, LogOut, LogIn, UserPlus, Building, Users } from "lucide-react"
@@ -22,28 +21,39 @@ export function Navbar() {
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login")
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [refreshImageKey, setRefreshImageKey] = useState(0)
+  const [hasRefreshedOnce, setHasRefreshedOnce] = useState(false) // Track si ya hizo refresh por registro
 
   const { user, isAuthenticated, logout, logoutWithBackend, token } = useAuth()
   const { isLoading: isGoogleAuthLoading } = useGoogleAuth()
   
-  // Función para refrescar la imagen de perfil
+  // Función para refrescar la imagen de perfil - SOLO MANUAL
   const refreshProfileImage = () => {
     setRefreshImageKey(prev => prev + 1)
-    console.log('🔄 Forzando refresh de imagen de perfil')
+    setHasRefreshedOnce(false) // Permitir nuevo refresh manual
+    console.log('🔄 Refresh manual de imagen de perfil')
   }
   
-  // Debug: Log del estado de autenticación
+  // Debug: Log del estado de autenticación - SOLO para refresh inicial
   useEffect(() => {
-    console.log('Auth state changed:', { isAuthenticated, user, token })
+    console.log('🔍 Navbar Auth state changed:', { isAuthenticated, user: !!user, token: !!token })
     if (user) {
-      console.log('User data:', {
+      console.log('👤 Navbar User data:', {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        profileImage: user.profileImage,
+        provider: user.provider
       })
+      
+      // Si es un usuario de Google Y no hemos hecho refresh aún, forzar UNA SOLA VEZ
+      if (user.provider === 'GOOGLE' && user.profileImage && !hasRefreshedOnce) {
+        console.log('🔄 Usuario de Google recién registrado, forzando refresh de imagen UNA VEZ')
+        setRefreshImageKey(prev => prev + 1)
+        setHasRefreshedOnce(true) // Marcar que ya se hizo el refresh
+      }
     }
-  }, [isAuthenticated, user, token])
+  }, [isAuthenticated, user, token, hasRefreshedOnce])
 
   useEffect(() => {
     setIsMounted(true)
@@ -189,12 +199,11 @@ export function Navbar() {
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   onMouseEnter={() => setIsUserMenuOpen(true)}
                 >
-                  {isAuthenticated ? (
-                    <UserAvatar 
-                      key={refreshImageKey} 
+                  {isAuthenticated && user ? (
+                    <ImmediateAvatar 
+                      key={user.id} // Key simple basado en ID del usuario
                       size="sm" 
                       variant="primary" 
-                      autoRefresh={true}
                     />
                   ) : (
                     <User className="w-4 h-4" />
@@ -439,15 +448,6 @@ export function Navbar() {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
-
-      {/* Google Image Status Indicator */}
-      {isAuthenticated && user && (
-        <GoogleImageStatus
-          imageUrl={user.profileImage}
-          userName={user.name}
-          onRefresh={refreshProfileImage}
-        />
-      )}
     </>
   )
 } 

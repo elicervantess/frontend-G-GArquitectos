@@ -42,32 +42,25 @@ export interface AvatarProps
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ className, size, variant, src, alt, fallback, name, children, ...props }, ref) => {
     const [imageError, setImageError] = React.useState(false)
-    const [isLoading, setIsLoading] = React.useState(!!src)
-    const [retryCount, setRetryCount] = React.useState(0)
-    const maxRetries = 3
+    const [isLoading, setIsLoading] = React.useState(false) // Solo mostrar loading cuando sea necesario
+    const [hasLoadedOnce, setHasLoadedOnce] = React.useState(false) // Track si ya cargó una vez
     
-    // Reset states when src changes
+    // Debug logs (solo cuando sea necesario)
+    if (src && !hasLoadedOnce) {
+      console.log('🎭 Avatar primera carga:', { src, name })
+    }
+    
+    // Reset states when src changes - pero sin loading innecesario
     React.useEffect(() => {
-      if (src) {
+      if (src && !hasLoadedOnce) {
         setImageError(false)
         setIsLoading(true)
-        setRetryCount(0)
+      } else if (src && hasLoadedOnce) {
+        // Ya cargó antes, no mostrar loading
+        setImageError(false)
+        setIsLoading(false)
       }
-    }, [src])
-    
-    // Retry loading image after error (useful for Google profile images that might not be ready yet)
-    React.useEffect(() => {
-      if (imageError && retryCount < maxRetries && src) {
-        const timer = setTimeout(() => {
-          console.log(`🔄 Reintentando cargar imagen (intento ${retryCount + 1}/${maxRetries}):`, src)
-          setImageError(false)
-          setIsLoading(true)
-          setRetryCount(prev => prev + 1)
-        }, (retryCount + 1) * 2000) // 2s, 4s, 6s delays
-        
-        return () => clearTimeout(timer)
-      }
-    }, [imageError, retryCount, src, maxRetries])
+    }, [src, hasLoadedOnce])
     
     const shouldShowFallback = (!src || imageError) && !isLoading
     
@@ -87,12 +80,14 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       console.log('✅ Imagen de perfil cargada exitosamente:', src)
       setIsLoading(false)
       setImageError(false)
+      setHasLoadedOnce(true) // Marcar que ya cargó una vez
     }
     
     const handleImageError = () => {
       console.log('❌ Error al cargar imagen de perfil:', src)
       setIsLoading(false)
       setImageError(true)
+      setHasLoadedOnce(true) // Marcar que ya intentó cargar
     }
     
     return (
@@ -111,6 +106,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
             )}
             onLoad={handleImageLoad}
             onError={handleImageError}
+            loading="eager" // Cargar imágenes inmediatamente
           />
         )}
         

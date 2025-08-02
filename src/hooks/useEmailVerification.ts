@@ -13,6 +13,7 @@ interface UseEmailVerificationReturn {
   registerWithVerification: (data: RegisterWithVerificationData) => Promise<{ success: boolean; message: string }>
   verifyEmail: (email: string, code: string) => Promise<{ success: boolean; token?: string; message: string }>
   resendVerificationCode: (email: string) => Promise<{ success: boolean; message: string }>
+  clearError: () => void
   isLoading: boolean
   error: string | null
 }
@@ -20,7 +21,7 @@ interface UseEmailVerificationReturn {
 export function useEmailVerification(): UseEmailVerificationReturn {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { loginWithToken } = useAuth()
+  const { loginWithToken, updateUserProfile } = useAuth()
   
   // URL directa a tu backend Spring Boot
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
@@ -36,7 +37,8 @@ export function useEmailVerification(): UseEmailVerificationReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: data.fullName,
+          name: data.fullName, // Usando fullName como name
+          fullName: data.fullName, // También enviamos fullName por si el backend lo usa
           email: data.email,
           password: data.password,
           role: 'USER'
@@ -121,7 +123,88 @@ export function useEmailVerification(): UseEmailVerificationReturn {
 
       // Automatically log in the user after successful verification
       if (result.token) {
-        await loginWithToken(result.token, { email, name: 'Usuario' })
+        console.log('🔐 Token recibido, iniciando proceso de login automático...')
+        
+        // Decodificar el token para obtener los datos del usuario
+        try {
+          // Usar la función helper para obtener los datos del token
+          const tokenPayload = JSON.parse(atob(result.token.split('.')[1]))
+          
+          // Hacer una llamada adicional para obtener los datos completos del usuario
+          try {
+            const userResponse = await fetch(`${backendUrl}/users/me`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${result.token}`,
+                'Content-Type': 'application/json',
+              },
+            })
+            
+            if (userResponse.ok) {
+              const userDataFromBackend = await userResponse.json()
+              console.log('Datos del usuario desde /users/me:', userDataFromBackend)
+              
+              const completeUserData = {
+                id: userDataFromBackend.id,
+                email: userDataFromBackend.email,
+                name: userDataFromBackend.fullName, // El DTO usa fullName
+                fullName: userDataFromBackend.fullName,
+                role: userDataFromBackend.role,
+                profileImage: userDataFromBackend.profileImage,
+                lastPasswordUpdate: userDataFromBackend.lastPasswordUpdate,
+                provider: userDataFromBackend.provider || 'EMAIL'
+              }
+              
+              console.log('Datos completos para loginWithToken:', completeUserData)
+              await loginWithToken(result.token, completeUserData)
+              
+              // Actualizar inmediatamente el perfil para forzar la re-renderización
+              updateUserProfile(completeUserData)
+              
+              console.log('✅ Usuario logueado y perfil actualizado correctamente')
+            } else {
+              console.error('❌ Error al obtener /users/me, status:', userResponse.status)
+              const errorText = await userResponse.text()
+              console.error('❌ Error response:', errorText)
+              
+              // Fallback: usar datos del token
+              const userData = {
+                id: tokenPayload.sub || tokenPayload.userId,
+                email: tokenPayload.email || email,
+                name: tokenPayload.fullName || tokenPayload.name || 'Usuario',
+                fullName: tokenPayload.fullName || tokenPayload.name || 'Usuario',
+                role: tokenPayload.role || 'USER',
+                profileImage: tokenPayload.profileImage,
+                provider: 'EMAIL'
+              }
+              console.log('⚠️ Usando fallback con datos del token:', userData)
+              await loginWithToken(result.token, userData)
+            }
+          } catch (userFetchError) {
+            console.error('Error al obtener datos del usuario:', userFetchError)
+            // Fallback: usar datos del token
+            const userData = {
+              id: tokenPayload.sub || tokenPayload.userId,
+              email: tokenPayload.email || email,
+              name: tokenPayload.fullName || tokenPayload.name || 'Usuario',
+              fullName: tokenPayload.fullName || tokenPayload.name || 'Usuario',
+              role: tokenPayload.role || 'USER',
+              profileImage: tokenPayload.profileImage,
+              provider: 'EMAIL'
+            }
+            console.log('⚠️ Error al obtener /users/me, usando fallback:', userData)
+            await loginWithToken(result.token, userData)
+          }
+        } catch (tokenError) {
+          console.error('Error al decodificar token:', tokenError)
+          // Fallback con datos básicos
+          await loginWithToken(result.token, { 
+            email, 
+            name: 'Usuario',
+            fullName: 'Usuario',
+            provider: 'EMAIL'
+          })
+        }
       }
 
       return { 
@@ -193,10 +276,15 @@ export function useEmailVerification(): UseEmailVerificationReturn {
     }
   }
 
+  const clearError = () => {
+    setError(null)
+  }
+
   return {
     registerWithVerification,
     verifyEmail,
     resendVerificationCode,
+    clearError,
     isLoading,
     error
   }
