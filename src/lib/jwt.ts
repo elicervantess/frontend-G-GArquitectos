@@ -1,5 +1,4 @@
-// Utilidades para manejar JWT en el frontend
-
+// src/lib/jwt.ts
 interface JWTPayload {
   sub: string
   role: string
@@ -19,9 +18,8 @@ export function decodeJWT(token: string): JWTPayload | null {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     )
-    
     return JSON.parse(jsonPayload)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error decoding JWT:', error)
     return null
   }
@@ -31,11 +29,10 @@ export function isTokenValid(token: string): boolean {
   try {
     const payload = decodeJWT(token)
     if (!payload) return false
-    
     // Verificar si el token ha expirado
     const currentTime = Math.floor(Date.now() / 1000)
     return payload.exp > currentTime
-  } catch (error) {
+  } catch (_error) {
     return false
   }
 }
@@ -44,9 +41,8 @@ export function getTokenExpirationTime(token: string): Date | null {
   try {
     const payload = decodeJWT(token)
     if (!payload) return null
-    
     return new Date(payload.exp * 1000) // Convertir de timestamp a Date
-  } catch (error) {
+  } catch (_error) {
     return null
   }
 }
@@ -55,23 +51,19 @@ export function getUserFromToken(token: string) {
   try {
     const payload = decodeJWT(token)
     if (!payload) return null
-    
     return {
       id: payload.sub,
       email: payload.sub,
       name: payload.fullName,
       role: payload.role
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting user from token:', error)
     return null
   }
 }
 
 export function createAuthHeaders(token: string) {
-  console.log('🔑 Creating auth headers with token:', token)
-  console.log('🔍 Token parts count:', token.split('.').length)
-  
   return {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json'

@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function GoogleAuthCallback() {
+function GoogleAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -59,5 +59,20 @@ export default function GoogleAuthCallback() {
         <p className="text-gray-600">Procesando autenticación...</p>
       </div>
     </div>
+  )
+}
+
+export default function GoogleAuthCallback() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    }>
+      <GoogleAuthCallbackContent />
+    </Suspense>
   )
 } 

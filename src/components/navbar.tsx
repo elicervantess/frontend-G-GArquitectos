@@ -95,12 +95,28 @@ export function Navbar() {
   }, [isUserMenuOpen])
 
   const navItems = [
-    { name: "Inicio", href: "/" },
-    { name: "Servicios", href: "/servicios" },
-    { name: "Proyectos", href: "/proyectos" },
-    { name: "Sobre Nosotros", href: "/sobre-nosotros" },
-    { name: "Contacto", href: "/contacto" },
+    { name: "Inicio", href: "#inicio" },
+    { name: "Proyectos", href: "#proyectos" },
+    { name: "Servicios", href: "#servicios" },
+    { name: "Sobre Nosotros", href: "#sobre-nosotros" },
+    { name: "Contacto", href: "#contacto" },
   ]
+
+  // Función para scroll suave
+  const scrollToSection = (href: string) => {
+    const elementId = href.replace('#', '')
+    const element = document.getElementById(elementId)
+    
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+    
+    // Cerrar menú móvil si está abierto
+    setIsMobileMenuOpen(false)
+  }
 
   const handleSearch = (query: string) => {
     console.log("Búsqueda:", query)
@@ -231,9 +247,9 @@ export function Navbar() {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
               {navItems.map((item, index) => (
-                <motion.a
+                <motion.button
                   key={item.name}
-                  href={item.href}
+                  onClick={() => scrollToSection(item.href)}
                   initial={{ opacity: 0, y: -30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ 
@@ -271,7 +287,7 @@ export function Navbar() {
                       ease: "easeOut"
                     }}
                   />
-                </motion.a>
+                </motion.button>
               ))}
             </div>
 
@@ -614,9 +630,9 @@ export function Navbar() {
             >
               <div className="px-6 py-8 space-y-6">
                 {navItems.map((item, index) => (
-                  <motion.a
+                  <motion.button
                     key={item.name}
-                    href={item.href}
+                    onClick={() => scrollToSection(item.href)}
                     initial={{ opacity: 0, x: -30, filter: "blur(4px)" }}
                     animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                     transition={{ 
@@ -631,15 +647,14 @@ export function Navbar() {
                       x: 5,
                       filter: "brightness(1.2)"
                     }}
-                    className={`block text-xl font-inter font-semibold transition-all duration-300 py-2 border-b ${
+                    className={`block text-xl font-inter font-semibold transition-all duration-300 py-2 border-b w-full text-left ${
                       actualTheme === 'dark'
                         ? 'text-white/90 hover:text-white border-white/10 hover:border-white/30'
                         : 'text-gray-900/90 hover:text-gray-900 border-gray-200 hover:border-gray-400'
                     }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
-                  </motion.a>
+                  </motion.button>
                 ))}
                 
                 {/* Mobile Auth Section */}
