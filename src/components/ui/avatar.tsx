@@ -9,10 +9,11 @@ const avatarVariants = cva(
     variants: {
       size: {
         sm: "h-8 w-8",
-        md: "h-10 w-10",
+        md: "h-10 w-10", 
         lg: "h-12 w-12",
         xl: "h-16 w-16",
         "2xl": "h-20 w-20",
+        navbar: "h-9 w-9", // Tamaño específico para navbar
       },
       variant: {
         default: "bg-gray-100 dark:bg-gray-800",
@@ -21,6 +22,7 @@ const avatarVariants = cva(
         warning: "bg-yellow-100 dark:bg-yellow-900",
         danger: "bg-red-100 dark:bg-red-900",
         glass: "bg-white/20 backdrop-blur-sm border border-white/30",
+        navbar: "bg-transparent", // Sin fondo para navbar
       },
     },
     defaultVariants: {
@@ -101,8 +103,9 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
             src={src}
             alt={alt}
             className={cn(
-              "aspect-square h-full w-full object-cover transition-opacity duration-300",
-              isLoading ? "opacity-0" : "opacity-100"
+              "aspect-square h-full w-full object-cover transition-all duration-300 rounded-full",
+              isLoading ? "opacity-0 scale-95" : "opacity-100 scale-100",
+              variant === "navbar" && "border-0" // Sin borde adicional para navbar
             )}
             onLoad={handleImageLoad}
             onError={handleImageError}
@@ -112,19 +115,36 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         
         {/* Loading state */}
         {isLoading && (
-          <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300" />
+          <div className={cn(
+            "absolute inset-0 flex h-full w-full items-center justify-center",
+            variant === "navbar" 
+              ? "bg-transparent" 
+              : "bg-gray-100 dark:bg-gray-800"
+          )}>
+            {variant !== "navbar" && (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300" />
+            )}
           </div>
         )}
         
         {shouldShowFallback && (
           <div className="flex h-full w-full items-center justify-center">
             {fallbackContent ? (
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <span className={cn(
+                "text-sm font-medium",
+                variant === "navbar" 
+                  ? "text-gray-700 dark:text-gray-200"
+                  : "text-gray-600 dark:text-gray-300"
+              )}>
                 {fallbackContent}
               </span>
             ) : (
-              <User className="h-1/2 w-1/2 text-gray-400" />
+              <User className={cn(
+                "h-1/2 w-1/2",
+                variant === "navbar"
+                  ? "text-gray-700 dark:text-gray-200"
+                  : "text-gray-400"
+              )} />
             )}
           </div>
         )}

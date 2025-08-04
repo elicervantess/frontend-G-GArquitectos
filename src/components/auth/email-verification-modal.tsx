@@ -6,8 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Loading } from '../ui/loading'
-import { CheckCircle2, Mail, Clock, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
+import { CheckCircle2, Mail, Clock, AlertCircle, ArrowLeft, Loader2, X } from 'lucide-react'
 import { useEmailVerification } from '@/hooks/useEmailVerification'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface EmailVerificationModalProps {
   isOpen: boolean
@@ -31,6 +32,7 @@ export function EmailVerificationModal({
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null))
   
   const { verifyEmail, resendVerificationCode, clearError, isLoading, error } = useEmailVerification()
+  const { theme } = useTheme()
   // Countdown timer para reenvío
   useEffect(() => {
     if (isOpen && timeLeft > 0) {
@@ -128,12 +130,32 @@ export function EmailVerificationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={`sm:max-w-md ${
+        theme === 'dark' 
+          ? 'bg-gray-900 border-gray-700' 
+          : 'bg-white border-gray-200'
+      }`}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-blue-600" />
-            Verifica tu email
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className={`flex items-center gap-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              <Mail className={`h-5 w-5 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`} />
+              Verifica tu email
+            </DialogTitle>
+            <button
+              onClick={onClose}
+              className={`p-1 rounded-lg transition-colors hover:bg-gray-100 ${
+                theme === 'dark'
+                  ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </DialogHeader>
 
         <AnimatePresence mode="wait">
@@ -145,11 +167,17 @@ export function EmailVerificationModal({
               exit={{ opacity: 0, scale: 0.9 }}
               className="flex flex-col items-center py-8"
             >
-              <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <CheckCircle2 className={`h-16 w-16 mb-4 ${
+                theme === 'dark' ? 'text-green-400' : 'text-green-500'
+              }`} />
+              <h3 className={`text-lg font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
                 ¡Email verificado!
               </h3>
-              <p className="text-gray-600 text-center">
+              <p className={`text-center ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}>
                 Tu cuenta ha sido verificada exitosamente
               </p>
             </motion.div>
@@ -162,10 +190,14 @@ export function EmailVerificationModal({
               className="space-y-6"
             >
               <div className="text-center">
-                <p className="text-gray-600 mb-2">
+                <p className={`mb-2 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>
                   Hemos enviado un código de verificación de 6 dígitos a:
                 </p>
-                <p className="font-semibold text-gray-900">{email}</p>
+                <p className={`font-semibold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>{email}</p>
               </div>
 
               {/* Inputs para el código */}
@@ -181,7 +213,11 @@ export function EmailVerificationModal({
                       inputMode="numeric"
                       pattern="[0-9]"
                       maxLength={1}
-                      className="w-12 h-12 text-center text-lg font-semibold"
+                      className={`w-12 h-12 text-center text-lg font-semibold transition-all duration-300 ${
+                        theme === 'dark'
+                          ? 'bg-gray-800 border-gray-600 text-white focus:border-gray-400 focus:bg-gray-700'
+                          : 'bg-white border-gray-300 text-gray-900 focus:border-gray-500'
+                      }`}
                       value={verificationCode[index] || ''}
                       onChange={(e) => handleCodeChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
@@ -194,7 +230,11 @@ export function EmailVerificationModal({
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
+                    className={`flex items-center gap-2 text-sm p-3 rounded-lg ${
+                      theme === 'dark'
+                        ? 'text-red-400 bg-red-900/20 border border-red-800'
+                        : 'text-red-600 bg-red-50 border border-red-200'
+                    }`}
                   >
                     <AlertCircle className="h-4 w-4" />
                     {error}
@@ -203,11 +243,15 @@ export function EmailVerificationModal({
               </div>
 
               {/* Botones de acción */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <Button
                   onClick={() => handleVerify()}
                   disabled={verificationCode.length !== 6 || isLoading}
-                  className="w-full"
+                  className={`w-full h-12 font-medium transition-all duration-300 ${
+                    theme === 'dark'
+                      ? 'bg-white hover:bg-gray-100 text-black disabled:bg-gray-600 disabled:text-gray-400'
+                      : 'bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500'
+                  }`}
                   size="lg"
                 >
                   {isLoading ? (
@@ -220,13 +264,17 @@ export function EmailVerificationModal({
                   )}
                 </Button>
 
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between">
                   <Button
                     variant="ghost"
                     onClick={onBackToRegister}
-                    className="p-0 h-auto text-gray-600 hover:text-gray-900"
+                    className={`flex items-center gap-1 p-2 h-auto transition-colors ${
+                      theme === 'dark'
+                        ? 'text-gray-300 hover:text-white hover:bg-gray-800'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    <ArrowLeft className="h-4 w-4" />
                     Cambiar email
                   </Button>
 
@@ -235,7 +283,11 @@ export function EmailVerificationModal({
                       variant="ghost"
                       onClick={handleResend}
                       disabled={isLoading}
-                      className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                      className={`p-2 h-auto transition-colors ${
+                        theme === 'dark'
+                          ? 'text-gray-300 hover:text-white hover:bg-gray-800 disabled:text-gray-500'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 disabled:text-gray-400'
+                      }`}
                     >
                       {isLoading ? (
                         <>
@@ -247,7 +299,9 @@ export function EmailVerificationModal({
                       )}
                     </Button>
                   ) : (
-                    <div className="flex items-center gap-1 text-gray-500">
+                    <div className={`flex items-center gap-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
                       <Clock className="h-4 w-4" />
                       {formatTime(timeLeft)}
                     </div>
@@ -255,7 +309,9 @@ export function EmailVerificationModal({
                 </div>
               </div>
 
-              <div className="text-center text-xs text-gray-500">
+              <div className={`text-center text-xs ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 ¿No recibiste el código? Revisa tu carpeta de spam o correo no deseado
               </div>
             </motion.div>

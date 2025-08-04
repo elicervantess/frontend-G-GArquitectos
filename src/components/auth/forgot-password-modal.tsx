@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Toast from "@/components/ui/toast"
 import { usePasswordReset } from "@/hooks/usePasswordReset"
+import { useTheme } from "@/contexts/ThemeContext"
 
 interface ForgotPasswordModalProps {
   isOpen: boolean
@@ -32,6 +33,7 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
 
   const router = useRouter()
   const { forgotPassword } = usePasswordReset()
+  const { theme, actualTheme } = useTheme()
 
   // Reset state when modal closes
   useEffect(() => {
@@ -124,18 +126,34 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
               className="relative w-full max-w-md mx-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <Card className="relative overflow-hidden border border-gray-200 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-900">
+              <Card className={`relative overflow-hidden border shadow-2xl ${
+                actualTheme === 'dark'
+                  ? 'border-gray-700 bg-gray-900'
+                  : 'border-gray-200 bg-white'
+              }`}>
                 {/* Background Pattern */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-50/80 to-gray-100/80 dark:from-gray-900/80 dark:to-gray-800/80" />
+                <div className={`absolute inset-0 ${
+                  actualTheme === 'dark'
+                    ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80'
+                    : 'bg-gradient-to-br from-gray-50/80 to-gray-100/80'
+                }`} />
                 
                 {/* Floating Elements */}
                 <motion.div
-                  className="absolute top-4 left-4 w-20 h-20 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full opacity-10"
+                  className={`absolute top-4 left-4 w-20 h-20 rounded-full opacity-10 ${
+                    actualTheme === 'dark'
+                      ? 'bg-gradient-to-br from-gray-400 to-gray-600'
+                      : 'bg-gradient-to-br from-gray-400 to-gray-600'
+                  }`}
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                  className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full opacity-10"
+                  className={`absolute bottom-4 right-4 w-16 h-16 rounded-full opacity-10 ${
+                    actualTheme === 'dark'
+                      ? 'bg-gradient-to-br from-gray-500 to-gray-700'
+                      : 'bg-gradient-to-br from-gray-500 to-gray-700'
+                  }`}
                   animate={{ y: [0, 10, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
@@ -143,14 +161,22 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                 <CardHeader className="relative">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        actualTheme === 'dark'
+                          ? 'bg-gradient-to-br from-gray-600 to-gray-800'
+                          : 'bg-gradient-to-br from-gray-600 to-gray-800'
+                      }`}>
                         <Mail className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                        <CardTitle className={`text-2xl font-bold ${
+                          actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}>
                           {success ? "¡Email enviado!" : "Recuperar contraseña"}
                         </CardTitle>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <p className={`text-sm mt-1 ${
+                          actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
                           {success 
                             ? "Revisa tu bandeja de entrada" 
                             : "Te enviaremos un enlace de recuperación"
@@ -162,7 +188,11 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                       variant="ghost"
                       size="sm"
                       onClick={onClose}
-                      className="hover:bg-white/20 dark:hover:bg-black/20 rounded-xl"
+                      className={`rounded-xl transition-colors ${
+                        actualTheme === 'dark'
+                          ? 'hover:bg-gray-800 text-gray-400 hover:text-gray-200'
+                          : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+                      }`}
                     >
                       <X className="w-5 h-5" />
                     </Button>
@@ -179,20 +209,40 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                         exit={{ opacity: 0, y: -20 }}
                         className="text-center space-y-6"
                       >
-                        <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center mx-auto">
-                          <CheckCircle className="w-8 h-8 text-gray-700 dark:text-gray-300" />
+                        <div className="flex justify-center mb-6">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
+                            actualTheme === 'dark'
+                              ? 'bg-gradient-to-br from-gray-800 to-gray-700'
+                              : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                          }`}>
+                            <CheckCircle className={`w-8 h-8 ${
+                              actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`} />
+                          </div>
                         </div>
                         
                         <div className="space-y-3">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                          <h3 className={`text-lg font-semibold ${
+                            actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                          }`}>
                             ¡Enlace enviado exitosamente!
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                          <p className={`text-sm leading-relaxed ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
                             Hemos enviado un enlace de recuperación a:<br />
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{email}</span>
+                            <span className={`font-medium ${
+                              actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                            }`}>{email}</span>
                           </p>
-                          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                          <div className={`border rounded-lg p-3 ${
+                            actualTheme === 'dark'
+                              ? 'bg-gray-800 border-gray-700'
+                              : 'bg-gray-50 border-gray-200'
+                          }`}>
+                            <div className={`flex items-center gap-2 text-sm ${
+                              actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                               <Clock className="w-4 h-4" />
                               <span className="font-medium">El enlace expira en 30 minutos</span>
                             </div>
@@ -210,19 +260,31 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                               }
                               router.push(`/auth/check-email?email=${encodeURIComponent(email)}`)
                             }}
-                            className="w-full bg-gradient-to-r from-gray-800 to-black hover:from-gray-900 hover:to-gray-800 text-white"
+                            className={`w-full transition-all duration-300 ${
+                              actualTheme === 'dark'
+                                ? 'bg-white hover:bg-gray-100 text-black'
+                                : 'bg-gray-900 hover:bg-gray-800 text-white'
+                            }`}
                           >
-                            <Mail className="w-4 h-4 mr-2" />
-                            Ir a página de confirmación
+                            <div className="flex items-center justify-center">
+                              <Mail className="w-4 h-4 mr-2" />
+                              Ir a página de confirmación
+                            </div>
                           </Button>
                           <Button
                             onClick={onBackToLogin}
                             variant="ghost"
-                            className="w-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className={`w-full border transition-colors ${
+                              actualTheme === 'dark'
+                                ? 'border-gray-700 hover:bg-gray-800 text-gray-300 hover:text-white'
+                                : 'border-gray-200 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                            }`}
                           >
                             Volver al login
                           </Button>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                          <p className={`text-xs text-center ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
                             ¿No recibiste el email? Revisa tu carpeta de spam o cierra este modal para intentar nuevamente
                           </p>
                         </div>
@@ -237,7 +299,9 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                       >
                         <form onSubmit={handleSubmit} className="space-y-4">
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`text-sm font-medium ${
+                              actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                               Correo electrónico
                             </label>
                             <Input
@@ -257,12 +321,18 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                             <motion.div
                               initial={{ opacity: 0, y: -10 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800"
+                              className={`flex items-center gap-2 text-sm p-3 rounded-lg border ${
+                                actualTheme === 'dark'
+                                  ? 'text-red-400 bg-red-900/20 border-red-800'
+                                  : 'text-red-600 bg-red-50 border-red-200'
+                              }`}
                             >
                               <AlertCircle className="h-4 w-4 flex-shrink-0" />
                               <span>{error}</span>
                               {cooldownMinutes > 0 && (
-                                <div className="ml-auto text-xs bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded">
+                                <div className={`ml-auto text-xs px-2 py-1 rounded ${
+                                  actualTheme === 'dark' ? 'bg-red-900/40' : 'bg-red-100'
+                                }`}>
                                   {cooldownMinutes}min
                                 </div>
                               )}
@@ -272,7 +342,11 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                           <Button
                             type="submit"
                             disabled={isSubmitting || !email.trim()}
-                            className="w-full h-12 bg-gradient-to-r from-gray-800 to-black hover:from-gray-900 hover:to-gray-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                            className={`w-full h-12 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+                              actualTheme === 'dark'
+                                ? 'bg-white hover:bg-gray-100 text-black disabled:bg-gray-600 disabled:text-gray-400'
+                                : 'bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500'
+                            }`}
                           >
                             {isSubmitting ? (
                               <div className="flex items-center justify-center">
@@ -292,19 +366,35 @@ export function ForgotPasswordModal({ isOpen, onClose, onBackToLogin, onCloseAll
                           <button
                             type="button"
                             onClick={onBackToLogin}
-                            className="text-sm text-gray-600 dark:text-gray-400 hover:underline font-medium"
+                            className={`text-sm font-medium hover:underline transition-colors ${
+                              actualTheme === 'dark'
+                                ? 'text-gray-300 hover:text-white'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
                           >
                             ← Volver al login
                           </button>
                         </div>
 
-                        <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div className={`border rounded-lg p-4 ${
+                          actualTheme === 'dark'
+                            ? 'bg-gray-800/50 border-gray-700'
+                            : 'bg-gray-50 border-gray-200'
+                        }`}>
                           <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Mail className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                              actualTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
+                            }`}>
+                              <Mail className={`w-3 h-3 ${
+                                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                              }`} />
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                              <p className="font-medium text-gray-900 dark:text-gray-100 mb-1">¿Cómo funciona?</p>
+                            <div className={`text-xs leading-relaxed ${
+                              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              <p className={`font-medium mb-1 ${
+                                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                              }`}>¿Cómo funciona?</p>
                               <p>Recibirás un email con un enlace seguro que te permitirá crear una nueva contraseña. El enlace es válido solo por 30 minutos.</p>
                             </div>
                           </div>

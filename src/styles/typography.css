@@ -1,0 +1,113 @@
+/* Estilos tipográficos para Titillium Web */
+
+/* Títulos principales - Hero */
+.titillium-hero {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.titillium-title {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.titillium-subtitle {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* Texto de cuerpo */
+.titillium-body {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+
+.titillium-light {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.7;
+}
+
+.titillium-thin {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 200;
+  letter-spacing: 0.03em;
+  line-height: 1.8;
+}
+
+/* Clases utilitarias */
+.font-titillium-black { 
+  font-weight: 900; 
+  letter-spacing: -0.02em;
+}
+.font-titillium-bold { 
+  font-weight: 700; 
+  letter-spacing: -0.015em;
+}
+.font-titillium-semibold { 
+  font-weight: 600; 
+  letter-spacing: 0.05em;
+}
+.font-titillium-regular { 
+  font-weight: 400; 
+  letter-spacing: 0.01em;
+}
+.font-titillium-light { 
+  font-weight: 300; 
+  letter-spacing: 0.02em;
+}
+.font-titillium-thin { 
+  font-weight: 200; 
+  letter-spacing: 0.03em;
+}
+
+/* Mejoras para legibilidad */
+.text-architectural {
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'ss01' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Estilos específicos para arquitectura */
+.architectural-heading {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+.architectural-subtitle {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-variant: normal;
+}
+
+/* Efectos especiales para hero */
+.hero-title-primary {
+  font-size: clamp(3rem, 8vw, 8rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+}
+
+.hero-title-secondary {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}

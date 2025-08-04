@@ -6,11 +6,14 @@ import { motion } from "framer-motion"
 import { Mail, Clock, ArrowLeft, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTheme } from "@/contexts/ThemeContext"
+import { Navbar } from "@/components/navbar"
 
 export default function CheckEmailPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
+  const { theme, actualTheme } = useTheme()
 
   const [timeLeft, setTimeLeft] = useState(30 * 60) // 30 minutos en segundos
 
@@ -39,7 +42,13 @@ export default function CheckEmailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-black dark:to-gray-800 flex items-center justify-center p-4">
+    <>
+      <Navbar />
+      <div className={`min-h-screen pt-20 flex items-center justify-center p-4 ${
+        actualTheme === 'dark'
+          ? 'bg-gradient-to-br from-gray-900 via-black to-gray-800'
+          : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+      }`}>
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-4 -left-4 w-72 h-72 bg-gray-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
@@ -53,7 +62,11 @@ export default function CheckEmailPage() {
         transition={{ duration: 0.5 }}
         className="relative w-full max-w-md mx-auto"
       >
-        <Card className="relative overflow-hidden border border-gray-200 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-900">
+        <Card className={`relative overflow-hidden border shadow-2xl ${
+          actualTheme === 'dark'
+            ? 'border-gray-800 bg-gray-900'
+            : 'border-gray-200 bg-white'
+        }`}>
           <CardHeader className="text-center space-y-4 pb-6">
             <motion.div
               initial={{ scale: 0 }}
@@ -65,10 +78,14 @@ export default function CheckEmailPage() {
             </motion.div>
             
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <CardTitle className={`text-2xl font-bold mb-2 ${
+                actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
                 ¡Email enviado!
               </CardTitle>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className={`text-sm ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
                 Revisa tu bandeja de entrada
               </p>
             </div>
@@ -82,34 +99,62 @@ export default function CheckEmailPage() {
               className="text-center space-y-4"
             >
               <div className="space-y-3">
-                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                <p className={`text-sm leading-relaxed ${
+                  actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>
                   Hemos enviado un enlace de recuperación a:
                 </p>
-                <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                  <p className="font-medium text-gray-900 dark:text-gray-100 break-all">
+                <div className={`border rounded-lg p-3 ${
+                  actualTheme === 'dark'
+                    ? 'bg-gray-800 border-gray-700'
+                    : 'bg-gray-100 border-gray-200'
+                }`}>
+                  <p className={`font-medium break-all ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
                     {email || 'tu@email.com'}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <div className="flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 text-sm mb-2">
+                <div className={`border rounded-lg p-4 ${
+                  actualTheme === 'dark'
+                    ? 'bg-gray-800 border-gray-700'
+                    : 'bg-gray-100 border-gray-200'
+                }`}>
+                  <div className={`flex items-center justify-center gap-2 text-sm mb-2 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
                     <Clock className="w-4 h-4" />
                     <span className="font-medium">El enlace expira en:</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">
+                  <div className={`text-2xl font-bold font-mono ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>
                     {formatTime(timeLeft)}
                   </div>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-left">
+                <div className={`border rounded-lg p-4 text-left ${
+                  actualTheme === 'dark'
+                    ? 'bg-gray-800 border-gray-700'
+                    : 'bg-gray-50 border-gray-200'
+                }`}>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Sparkles className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      actualTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+                    }`}>
+                      <Sparkles className={`w-3 h-3 ${
+                        actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`} />
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                      <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">¿No ves el email?</p>
+                    <div className={`text-xs leading-relaxed ${
+                      actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      <p className={`font-medium mb-2 ${
+                        actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>¿No ves el email?</p>
                       <ul className="space-y-1 list-disc list-inside">
                         <li>Revisa tu carpeta de spam o correo no deseado</li>
                         <li>Asegúrate de que la dirección de email sea correcta</li>
@@ -123,21 +168,33 @@ export default function CheckEmailPage() {
               <div className="space-y-3 pt-2">
                 <Button
                   onClick={handleBackToLogin}
-                  className="w-full bg-gradient-to-r from-gray-800 to-black hover:from-gray-900 hover:to-gray-800 text-white font-medium h-12 rounded-xl shadow-lg"
+                  className={`w-full font-medium h-12 rounded-xl shadow-lg transition-all duration-300 ${
+                    actualTheme === 'dark'
+                      ? 'bg-white hover:bg-gray-100 text-black'
+                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                  }`}
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Volver al login
+                  <div className="flex items-center justify-center">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Volver al login
+                  </div>
                 </Button>
 
                 {timeLeft > 0 ? (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  <p className={`text-xs text-center ${
+                    actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
                     ¿No recibiste el email? Espera {Math.ceil(timeLeft / 60)} minutos antes de solicitar otro
                   </p>
                 ) : (
                   <Button
                     onClick={handleResendEmail}
                     variant="outline"
-                    className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className={`w-full transition-all duration-200 ${
+                      actualTheme === 'dark'
+                        ? 'bg-white text-black border-white hover:bg-gray-100'
+                        : 'bg-black text-white border-black hover:bg-gray-800'
+                    }`}
                   >
                     Solicitar nuevo enlace
                   </Button>
@@ -173,6 +230,7 @@ export default function CheckEmailPage() {
           animation-delay: 4s;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   )
 }

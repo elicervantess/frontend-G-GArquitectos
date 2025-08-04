@@ -1,0 +1,229 @@
+/* Optimizaciones CSS para avatares */
+
+/* Transiciones suaves para cambios de imagen */
+.avatar-container img {
+  transition: opacity 0.3s ease-in-out, transform 0.2s ease;
+}
+
+/* Avatar específico para navbar - completamente circular y sin fondo */
+.navbar-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.navbar-avatar::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+.navbar-avatar:hover::before {
+  opacity: 1;
+}
+
+.dark .navbar-avatar {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .navbar-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Asegurar que la imagen del avatar sea perfectamente circular */
+.navbar-avatar img {
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Remover cualquier fondo del contenedor padre */
+.navbar-avatar * {
+  background: transparent !important;
+}
+
+/* Botón contenedor del avatar - completamente transparente */
+.navbar-avatar-button {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.navbar-avatar-button:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.navbar-avatar-button:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.navbar-avatar-button:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Sobrescribir estilos específicos de button ghost */
+button.navbar-avatar-button[data-variant="ghost"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+button.navbar-avatar-button[data-variant="ghost"]:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Contenedor motion del avatar */
+.navbar-avatar-motion {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Asegurar que todos los elementos dentro del botón sean transparentes */
+.navbar-avatar-button > * {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Efecto de shimmer para carga */
+@keyframes avatar-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.avatar-loading {
+  background: linear-gradient(90deg, #f0f0f0 0px, #e0e0e0 40px, #f0f0f0 80px);
+  background-size: 200px;
+  animation: avatar-shimmer 1.5s infinite;
+}
+
+.dark .avatar-loading {
+  background: linear-gradient(90deg, #374151 0px, #4b5563 40px, #374151 80px);
+  background-size: 200px;
+}
+
+/* Optimización para imágenes de alta resolución */
+.avatar-high-dpi {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Indicadores de estado del cache */
+.cache-indicator {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.cache-hit {
+  background-color: #10b981;
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+}
+
+.cache-loading {
+  background-color: #3b82f6;
+  animation: pulse 1s infinite;
+}
+
+.cache-error {
+  background-color: #ef4444;
+}
+
+/* Hover suave para avatares */
+.navbar-avatar {
+  transition: all 0.2s ease;
+}
+
+.navbar-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Lazy loading placeholder */
+.avatar-placeholder {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
+
+/* Optimización para pantallas de alta densidad */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .avatar-container img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Mejoras de rendimiento */
+.avatar-container {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* Transición suave cuando cambia el src */
+.avatar-container img[src=""] {
+  opacity: 0;
+}
+
+.avatar-container img:not([src=""]) {
+  opacity: 1;
+}

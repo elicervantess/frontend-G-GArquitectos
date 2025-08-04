@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AlertWithIcon } from "@/components/ui/alert"
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useUserApi, UserRequestDto, ApiResponse } from '@/hooks/useUserApi'
 
 interface ProfileModalProps {
@@ -50,6 +51,7 @@ interface ChangePasswordModalProps {
 const EditableField = ({ label, value, icon, onSave, disabled = false, type = 'text' }: EditableFieldProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value)
+  const { theme, actualTheme } = useTheme()
 
   useEffect(() => {
     setEditValue(value)
@@ -79,15 +81,25 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative bg-gradient-to-br from-gray-50/50 to-slate-50/50 dark:from-gray-900/30 dark:to-slate-900/30 rounded-2xl p-5 border border-gray-200/50 dark:border-gray-700/50 hover:border-gray-300/70 dark:hover:border-gray-600/70 transition-all duration-300 backdrop-blur-sm"
+      className={`group relative rounded-2xl p-5 border transition-all duration-300 backdrop-blur-sm ${
+        actualTheme === 'dark'
+          ? 'bg-gradient-to-br from-gray-900/30 to-gray-800/30 border-gray-700/50 hover:border-gray-600/70'
+          : 'bg-gradient-to-br from-gray-50/50 to-gray-100/50 border-gray-200/50 hover:border-gray-300/70'
+      }`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/50 dark:to-slate-700/50 text-slate-600 dark:text-slate-400 shadow-sm">
+          <div className={`p-2.5 rounded-xl shadow-sm ${
+            actualTheme === 'dark'
+              ? 'bg-gradient-to-br from-gray-800/50 to-gray-700/50 text-gray-400'
+              : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600'
+          }`}>
             {icon}
           </div>
           <div className="flex-1">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider font-inter mb-1">
+            <p className={`text-xs font-semibold uppercase tracking-wider font-inter mb-1 ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               {label}
             </p>
             {isEditing ? (
@@ -97,7 +109,11 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="h-9 text-sm border-slate-200 focus:border-gray-500 dark:border-slate-700 dark:focus:border-gray-400 font-inter bg-white/80 dark:bg-gray-900/80"
+                  className={`h-9 text-sm font-inter ${
+                    actualTheme === 'dark'
+                      ? 'border-gray-700 focus:border-gray-400 bg-gray-900/80'
+                      : 'border-gray-200 focus:border-gray-500 bg-white/80'
+                  }`}
                   autoFocus
                   placeholder={`Ingresa tu ${label.toLowerCase()}`}
                 />
@@ -106,7 +122,11 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
                     size="sm"
                     variant="ghost"
                     onClick={handleSave}
-                    className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
+                    className={`h-9 w-9 p-0 ${
+                      actualTheme === 'dark'
+                        ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
                     <Check className="h-4 w-4" />
                   </Button>
@@ -114,14 +134,20 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
                     size="sm"
                     variant="ghost"
                     onClick={handleCancel}
-                    className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className={`h-9 w-9 p-0 ${
+                      actualTheme === 'dark'
+                        ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             ) : (
-              <p className="font-semibold text-gray-900 dark:text-gray-100 font-inter text-sm">
+              <p className={`font-semibold font-inter text-sm ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
                 {value || 'No especificado'}
               </p>
             )}
@@ -132,7 +158,11 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
             size="sm"
             variant="ghost"
             onClick={() => setIsEditing(true)}
-            className="opacity-0 group-hover:opacity-100 transition-all duration-200 h-9 w-9 p-0 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/50"
+            className={`opacity-0 group-hover:opacity-100 transition-all duration-200 h-9 w-9 p-0 ${
+              actualTheme === 'dark'
+                ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+            }`}
           >
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -143,9 +173,18 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
 }
 
 const PhotoOption = ({ icon, title, description, onClick, variant = 'default', disabled = false }: PhotoOptionProps) => {
-  const colorClasses = variant === 'danger' 
-    ? "border-red-200 hover:border-red-300 dark:border-red-800 dark:hover:border-red-700 hover:bg-red-50/50 dark:hover:bg-red-900/20"
-    : "border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/50"
+  const { theme, actualTheme } = useTheme()
+  
+  const getColorClasses = () => {
+    if (variant === 'danger') {
+      return actualTheme === 'dark' 
+        ? "border-red-800 hover:border-red-700 hover:bg-red-900/20"
+        : "border-red-200 hover:border-red-300 hover:bg-red-50/50"
+    }
+    return actualTheme === 'dark'
+      ? "border-gray-700 hover:border-gray-600 hover:bg-gray-800/50"
+      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
+  }
 
   const disabledClasses = disabled 
     ? "opacity-50 cursor-not-allowed"
@@ -160,15 +199,23 @@ const PhotoOption = ({ icon, title, description, onClick, variant = 'default', d
         onClick()
       }}
       disabled={disabled}
-      className={`w-full p-4 rounded-2xl border-2 border-dashed ${colorClasses} ${disabledClasses} transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-gray-500/20`}
+      className={`w-full p-4 rounded-2xl border-2 border-dashed ${getColorClasses()} ${disabledClasses} transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-gray-500/20`}
     >
       <div className="flex items-center gap-4 text-left">
-        <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors shadow-sm">
+        <div className={`p-3 rounded-xl shadow-sm transition-colors ${
+          actualTheme === 'dark'
+            ? 'bg-gray-800 group-hover:bg-gray-700'
+            : 'bg-gray-100 group-hover:bg-gray-200'
+        }`}>
           {icon}
         </div>
         <div>
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 font-inter text-sm">{title}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400 font-inter mt-0.5">{description}</p>
+          <h4 className={`font-semibold font-inter text-sm ${
+            actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>{title}</h4>
+          <p className={`text-xs font-inter mt-0.5 ${
+            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>{description}</p>
         </div>
       </div>
     </motion.button>
@@ -180,6 +227,7 @@ const PasswordVerificationModal = ({ isOpen, onClose, onVerified, userEmail }: P
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState('')
   const { verifyPassword } = useUserApi()
+  const { theme, actualTheme } = useTheme()
 
   const handleVerify = async () => {
     if (!password.trim()) {
@@ -219,7 +267,9 @@ const PasswordVerificationModal = ({ isOpen, onClose, onVerified, userEmail }: P
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-lg p-4"
+      className={`fixed inset-0 z-60 flex items-center justify-center backdrop-blur-lg p-4 ${
+        actualTheme === 'dark' ? 'bg-black/80' : 'bg-black/60'
+      }`}
       onClick={handleClose}
     >
       <motion.div
@@ -230,18 +280,30 @@ const PasswordVerificationModal = ({ isOpen, onClose, onVerified, userEmail }: P
         className="w-full max-w-md mx-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <Card className="border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
+        <Card className={`border-0 shadow-2xl backdrop-blur-xl ${
+          actualTheme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'
+        }`}>
           <CardContent className="p-6">
             <div className="text-center mb-6">
               <div className="flex items-center justify-center mb-4">
-                <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
-                  <Shield className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                <div className={`p-3 rounded-full ${
+                  actualTheme === 'dark'
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-700'
+                    : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                }`}>
+                  <Shield className={`w-6 h-6 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`} />
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 font-inter mb-2">
+              <h3 className={`text-xl font-bold font-inter mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
                 Verificar contraseña
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-inter">
+              <p className={`text-sm font-inter ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 Por seguridad, confirma tu contraseña actual
               </p>
             </div>
@@ -258,28 +320,62 @@ const PasswordVerificationModal = ({ isOpen, onClose, onVerified, userEmail }: P
                   autoFocus
                 />
                 {error && (
-                  <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                  <p className={`text-sm mt-2 ${
+                    actualTheme === 'dark' ? 'text-red-400' : 'text-red-600'
+                  }`}>
                     {error}
                   </p>
                 )}
               </div>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isVerifying}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleVerify}
-                  disabled={isVerifying || !password.trim()}
-                  className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900"
-                >
-                  {isVerifying ? 'Verificando...' : 'Verificar'}
-                </Button>
+              <div className="flex justify-center pt-2">
+                <div className="flex gap-3 w-full max-w-sm">
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    className={`flex-1 min-w-[100px] transition-all duration-200 ${
+                      actualTheme === 'dark'
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                    disabled={isVerifying}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleVerify}
+                    disabled={isVerifying || !password.trim()}
+                    className={`flex-1 min-w-[100px] font-semibold transition-all duration-200 shadow-lg border-0 ${
+                      isVerifying || !password.trim() 
+                        ? 'opacity-50 cursor-not-allowed' 
+                        : 'hover:shadow-xl hover:scale-[1.02]'
+                    } ${
+                      actualTheme === 'dark'
+                        ? 'bg-white hover:bg-gray-100 text-black'
+                        : 'bg-gray-800 hover:bg-gray-900 text-white'
+                    }`}
+                    onMouseEnter={(e) => {
+                      if (!isVerifying && password.trim()) {
+                        if (actualTheme === 'dark') {
+                          e.currentTarget.style.backgroundColor = 'rgb(243 244 246)' // gray-100
+                        } else {
+                          e.currentTarget.style.backgroundColor = 'rgb(17 24 39)' // gray-900
+                        }
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isVerifying && password.trim()) {
+                        if (actualTheme === 'dark') {
+                          e.currentTarget.style.backgroundColor = 'rgb(255 255 255)' // white
+                        } else {
+                          e.currentTarget.style.backgroundColor = 'rgb(31 41 55)' // gray-800
+                        }
+                      }
+                    }}
+                  >
+                    {isVerifying ? 'Verificando...' : 'Verificar'}
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -296,6 +392,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
   const [error, setError] = useState('')
   const { updateCurrentUser, getCurrentUser } = useUserApi()
   const { token } = useAuth()
+  const { theme, actualTheme } = useTheme()
   const [userFullName, setUserFullName] = useState('')
 
   // Cargar datos del usuario cuando se abre el modal
@@ -394,7 +491,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-lg p-4"
+      className={`fixed inset-0 z-60 flex items-center justify-center backdrop-blur-lg p-4 ${
+        actualTheme === 'dark' ? 'bg-black/80' : 'bg-black/60'
+      }`}
       onClick={handleClose}
     >
       <motion.div
@@ -405,26 +504,42 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
         className="w-full max-w-md mx-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <Card className="border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
+        <Card className={`border-0 shadow-2xl backdrop-blur-xl ${
+          actualTheme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'
+        }`}>
           <CardContent className="p-0">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100/50 dark:border-gray-800/50">
+            <div className={`p-6 border-b ${
+              actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+            }`}>
               <div className="flex items-center justify-center mb-4">
-                <div className="p-3 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
-                  <Key className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                <div className={`p-3 rounded-full ${
+                  actualTheme === 'dark'
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-700'
+                    : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                }`}>
+                  <Key className={`w-6 h-6 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`} />
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 font-inter text-center mb-2">
+              <h3 className={`text-xl font-bold font-inter text-center mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>
                 Cambiar contraseña
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-inter text-center">
+              <p className={`text-sm font-inter text-center ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 Ingresa tu nueva contraseña (ya verificamos tu identidad)
               </p>
             </div>
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${
+                  actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   Nueva contraseña
                 </label>
                 <Input
@@ -438,7 +553,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${
+                  actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   Confirmar nueva contraseña
                 </label>
                 <Input
@@ -452,29 +569,49 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
               </div>
 
               {error && (
-                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                  <p className="text-sm text-red-600 dark:text-red-400">
+                <div className={`p-3 rounded-lg border ${
+                  actualTheme === 'dark'
+                    ? 'bg-red-900/20 border-red-800'
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <p className={`text-sm ${
+                    actualTheme === 'dark' ? 'text-red-400' : 'text-red-600'
+                  }`}>
                     {error}
                   </p>
                 </div>
               )}
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className="flex-1"
-                  disabled={isChanging}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleChangePassword}
-                  disabled={isChanging || !newPassword.trim() || !confirmPassword.trim()}
-                  className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900"
-                >
-                  {isChanging ? 'Cambiando...' : 'Cambiar contraseña'}
-                </Button>
+              <div className="flex justify-center pt-2">
+                <div className="flex gap-3 w-full max-w-sm">
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    className={`flex-1 min-w-[100px] transition-all duration-200 ${
+                      actualTheme === 'dark'
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                    disabled={isChanging}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleChangePassword}
+                    disabled={isChanging || !newPassword.trim() || !confirmPassword.trim()}
+                    className={`flex-1 min-w-[100px] font-semibold transition-all duration-200 shadow-lg ${
+                      isChanging || !newPassword.trim() || !confirmPassword.trim()
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:shadow-xl hover:scale-[1.02]'
+                    } ${
+                      actualTheme === 'dark'
+                        ? 'bg-white hover:bg-gray-100 text-black border-0'
+                        : 'bg-gray-800 hover:bg-gray-900 text-white border-0'
+                    }`}
+                  >
+                    {isChanging ? 'Cambiando...' : 'Cambiar contraseña'}
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -486,6 +623,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
 
 function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { user, token, updateUserProfile } = useAuth()
+  const { theme, actualTheme } = useTheme()
   const { getCurrentUser, updateCurrentUser, updateProfilePhoto, removeProfilePhoto } = useUserApi()
   
   // Estados principales
@@ -1043,7 +1181,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-lg p-4"
+        className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg p-4 ${
+          actualTheme === 'dark' ? 'bg-black/80' : 'bg-black/60'
+        }`}
         onClick={handleClose}
       >
         <motion.div
@@ -1054,11 +1194,25 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           className="relative w-full max-w-2xl mx-auto max-h-[90vh] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <Card className="relative overflow-hidden border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
+          <Card className={`relative overflow-hidden border-0 shadow-2xl backdrop-blur-xl ${
+            actualTheme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'
+          }`}>
             {/* Patrón de fondo decorativo */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-slate-50/30 dark:from-gray-900/10 dark:via-transparent dark:to-slate-900/10" />
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-gray-100/20 to-transparent dark:from-gray-800/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-100/20 to-transparent dark:from-slate-800/10 rounded-full blur-2xl" />
+            <div className={`absolute inset-0 ${
+              actualTheme === 'dark'
+                ? 'bg-gradient-to-br from-gray-900/10 via-transparent to-gray-800/10'
+                : 'bg-gradient-to-br from-gray-50/30 via-transparent to-gray-100/30'
+            }`} />
+            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl ${
+              actualTheme === 'dark'
+                ? 'bg-gradient-to-bl from-gray-800/10 to-transparent'
+                : 'bg-gradient-to-bl from-gray-100/20 to-transparent'
+            }`} />
+            <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full blur-2xl ${
+              actualTheme === 'dark'
+                ? 'bg-gradient-to-tr from-gray-800/10 to-transparent'
+                : 'bg-gradient-to-tr from-gray-100/20 to-transparent'
+            }`} />
             
             <CardContent className="relative p-0">
               <AnimatePresence mode="wait">
@@ -1073,22 +1227,36 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     className="overflow-y-auto max-h-[80vh]"
                   >
                     {/* Header */}
-                    <div className="relative p-6 pb-4 border-b border-gray-100/50 dark:border-gray-800/50">
+                    <div className={`relative p-6 pb-4 border-b ${
+                      actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                    }`}>
                       <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className={`absolute top-4 right-4 transition-colors p-2 rounded-full ${
+                          actualTheme === 'dark'
+                            ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'
+                            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                        }`}
                       >
                         <X className="w-5 h-5" />
                       </button>
                       
                       <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-2">
-                          <Sparkles className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent font-inter">
+                          <Sparkles className={`w-6 h-6 ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`} />
+                          <h2 className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent font-inter ${
+                            actualTheme === 'dark' 
+                              ? 'from-gray-100 to-gray-300' 
+                              : 'from-gray-900 to-gray-700'
+                          }`}>
                             Mi Perfil
                           </h2>
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-inter">
+                        <p className={`text-sm font-inter ${
+                          actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
                           Gestiona tu información personal
                         </p>
                       </div>
@@ -1099,7 +1267,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-8 h-8 border-2 border-gray-500 dark:border-gray-400 border-t-transparent rounded-full"
+                          className={`w-8 h-8 border-2 border-t-transparent rounded-full ${
+                            actualTheme === 'dark' ? 'border-gray-400' : 'border-gray-500'
+                          }`}
                         />
                       </div>
                     ) : (
@@ -1112,7 +1282,11 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                               className="relative cursor-pointer hover:scale-105 transition-transform duration-300"
                               onClick={() => setCurrentView('full-image')}
                             >
-                              <Avatar className="w-28 h-28 border-4 border-white dark:border-gray-800 shadow-2xl ring-2 ring-gray-200 dark:ring-gray-700/50">
+                              <Avatar className={`w-28 h-28 border-4 shadow-2xl ring-2 ${
+                                actualTheme === 'dark' 
+                                  ? 'border-gray-800 ring-gray-700/50' 
+                                  : 'border-white ring-gray-200'
+                              }`}>
                                 {previewImage ? (
                                   <img
                                     src={previewImage}
@@ -1142,7 +1316,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              className="absolute -bottom-2 -right-2 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white rounded-full p-2.5 shadow-lg border-3 border-white dark:border-gray-800 z-10 transition-all duration-200"
+                              className={`absolute -bottom-2 -right-2 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white rounded-full p-2.5 shadow-lg border-3 z-10 transition-all duration-200 ${
+                                actualTheme === 'dark' ? 'border-gray-800' : 'border-white'
+                              }`}
                               onClick={() => setCurrentView('photo-options')}
                             >
                               <Edit2 className="w-4 h-4" />
@@ -1151,10 +1327,14 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           
                           {/* Info del usuario */}
                           <div className="text-center mt-4">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 font-inter">
+                            <h3 className={`text-xl font-bold font-inter ${
+                              actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                            }`}>
                               {userData?.fullName || user?.name || 'Usuario'}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 font-inter mt-1">
+                            <p className={`text-sm font-inter mt-1 ${
+                              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
                               {userData?.email || user?.email}
                             </p>
                             
@@ -1163,7 +1343,11 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 onClick={restoreOriginalPhoto}
-                                className="mt-3 text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 underline font-inter transition-colors duration-200"
+                                className={`mt-3 text-xs underline font-inter transition-colors duration-200 ${
+                                  actualTheme === 'dark' 
+                                    ? 'text-gray-400 hover:text-gray-200' 
+                                    : 'text-gray-600 hover:text-gray-800'
+                                }`}
                               >
                                 Restaurar foto original
                               </motion.button>
@@ -1193,8 +1377,12 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
                         {/* Sección de seguridad - Solo mostrar si no es usuario de Google */}
                         {shouldShowPasswordOption() && (
-                          <div className="mt-6 pt-6 border-t border-gray-100/50 dark:border-gray-800/50">
-                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 font-inter flex items-center gap-2">
+                          <div className={`mt-6 pt-6 border-t ${
+                            actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                          }`}>
+                            <h4 className={`text-sm font-semibold mb-4 font-inter flex items-center gap-2 ${
+                              actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                               <Lock className="w-4 h-4" />
                               Seguridad
                             </h4>
@@ -1206,30 +1394,38 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                               disabled={!canChangePassword()}
                               className={`w-full p-4 rounded-2xl border transition-all duration-300 group ${
                                 canChangePassword() 
-                                  ? "bg-gradient-to-br from-gray-50/50 to-slate-50/50 dark:from-gray-900/30 dark:to-slate-900/30 border-gray-200/50 dark:border-gray-700/50 hover:border-gray-300/70 dark:hover:border-gray-600/70 cursor-pointer"
-                                  : "bg-gray-100/50 dark:bg-gray-800/50 border-gray-200/30 dark:border-gray-700/30 cursor-not-allowed opacity-60"
+                                  ? actualTheme === 'dark'
+                                    ? "bg-gradient-to-br from-gray-900/30 to-slate-900/30 border-gray-700/50 hover:border-gray-600/70 cursor-pointer"
+                                    : "bg-gradient-to-br from-gray-50/50 to-slate-50/50 border-gray-200/50 hover:border-gray-300/70 cursor-pointer"
+                                  : actualTheme === 'dark'
+                                    ? "bg-gray-800/50 border-gray-700/30 cursor-not-allowed opacity-60"
+                                    : "bg-gray-100/50 border-gray-200/30 cursor-not-allowed opacity-60"
                               }`}
                             >
                               <div className="flex items-center gap-4">
                                 <div className={`p-2.5 rounded-xl shadow-sm transition-transform duration-200 ${
                                   canChangePassword()
-                                    ? "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/50 dark:to-slate-700/50 text-slate-600 dark:text-slate-400 group-hover:scale-110"
-                                    : "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
+                                    ? actualTheme === 'dark'
+                                      ? "bg-gradient-to-br from-slate-800/50 to-slate-700/50 text-slate-400 group-hover:scale-110"
+                                      : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 group-hover:scale-110"
+                                    : actualTheme === 'dark'
+                                      ? "bg-gray-700 text-gray-500"
+                                      : "bg-gray-200 text-gray-400"
                                 }`}>
                                   <Key className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 text-left">
                                   <p className={`font-semibold font-inter text-sm ${
                                     canChangePassword()
-                                      ? "text-gray-900 dark:text-gray-100"
-                                      : "text-gray-500 dark:text-gray-400"
+                                      ? actualTheme === 'dark' ? "text-gray-100" : "text-gray-900"
+                                      : actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
                                   }`}>
                                     Cambiar contraseña
                                   </p>
                                   <p className={`text-xs font-inter mt-0.5 ${
                                     canChangePassword()
-                                      ? "text-gray-500 dark:text-gray-400"
-                                      : "text-gray-400 dark:text-gray-500"
+                                      ? actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
+                                      : actualTheme === 'dark' ? "text-gray-500" : "text-gray-400"
                                   }`}>
                                     {canChangePassword() 
                                       ? "Actualiza tu contraseña para mayor seguridad"
@@ -1249,22 +1445,37 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
                         {/* Información para usuarios de Google */}
                         {isGoogleUser() && (
-                          <div className="mt-6 pt-6 border-t border-gray-100/50 dark:border-gray-800/50">
-                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 font-inter flex items-center gap-2">
+                          <div className={`mt-6 pt-6 border-t ${
+                            actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                          }`}>
+                            <h4 className={`text-sm font-semibold mb-4 font-inter flex items-center gap-2 ${
+                              actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                               <Lock className="w-4 h-4" />
                               Seguridad
                             </h4>
-                            
-                            <div className="w-full p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/50">
+                            <div className={`w-full p-4 rounded-2xl border ${
+                              actualTheme === 'dark' 
+                                ? 'bg-blue-900/20 border-blue-700/50' 
+                                : 'bg-blue-50/50 border-blue-200/50'
+                            }`}>
                               <div className="flex items-center gap-4">
-                                <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-800/50 text-blue-600 dark:text-blue-400 shadow-sm">
+                                <div className={`p-2.5 rounded-xl shadow-sm ${
+                                  actualTheme === 'dark' 
+                                    ? 'bg-blue-800/50 text-blue-400' 
+                                    : 'bg-blue-100 text-blue-600'
+                                }`}>
                                   <Shield className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-semibold text-blue-900 dark:text-blue-100 font-inter text-sm">
+                                  <p className={`font-semibold font-inter text-sm ${
+                                    actualTheme === 'dark' ? 'text-blue-100' : 'text-blue-900'
+                                  }`}>
                                     Cuenta protegida por Google
                                   </p>
-                                  <p className="text-xs text-blue-700 dark:text-blue-300 font-inter mt-0.5">
+                                  <p className={`text-xs font-inter mt-0.5 ${
+                                    actualTheme === 'dark' ? 'text-blue-300' : 'text-blue-700'
+                                  }`}>
                                     Tu cuenta está asegurada mediante Google OAuth. No necesitas contraseña adicional.
                                   </p>
                                 </div>
@@ -1274,8 +1485,12 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         )}
 
                         {/* Footer */}
-                        <div className="pt-4 border-t border-gray-100/50 dark:border-gray-800/50">
-                          <p className="text-xs text-center text-gray-400 dark:text-gray-500 font-inter">
+                        <div className={`pt-4 border-t ${
+                          actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                        }`}>
+                          <p className={`text-xs text-center font-inter ${
+                            actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
                             {isSaving ? 'Guardando cambios...' : 'Los cambios se guardarán automáticamente'}
                           </p>
                         </div>
@@ -1295,22 +1510,32 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     className="min-h-[500px]"
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100/50 dark:border-gray-800/50">
+                    <div className={`flex items-center justify-between p-6 border-b ${
+                      actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                    }`}>
                       <button
                         onClick={() => setCurrentView('profile')}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        className={`flex items-center gap-2 transition-colors ${
+                          actualTheme === 'dark' 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="text-sm font-inter">Volver</span>
                       </button>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 font-inter">
+                      <h3 className={`text-lg font-bold font-inter ${
+                        actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         Cambiar foto
                       </h3>
                       <div className="w-16"></div>
                     </div>
                     
                     <div className="p-6">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center font-inter">
+                      <p className={`text-sm mb-6 text-center font-inter ${
+                        actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                         Elige cómo quieres actualizar tu foto de perfil
                       </p>
                       
@@ -1378,26 +1603,38 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     className="min-h-[600px]"
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100/50 dark:border-gray-800/50">
+                    <div className={`flex items-center justify-between p-6 border-b ${
+                      actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                    }`}>
                       <button
                         onClick={cancelCamera}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        className={`flex items-center gap-2 transition-colors ${
+                          actualTheme === 'dark' 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="text-sm font-inter">Cancelar</span>
                       </button>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 font-inter">
+                      <h3 className={`text-lg font-bold font-inter ${
+                        actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         Tomar foto
                       </h3>
                       <div className="w-16"></div>
                     </div>
                     
                     <div className="p-6">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-center font-inter">
+                      <p className={`text-sm mb-4 text-center font-inter ${
+                        actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                         Posiciona tu rostro en el centro del marco
                       </p>
                       
-                      <div className="relative mb-6 bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden shadow-inner">
+                      <div className={`relative mb-6 rounded-2xl overflow-hidden shadow-inner ${
+                        actualTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
+                      }`}>
                         <video
                           ref={videoRef}
                           autoPlay
@@ -1440,20 +1677,32 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     className="min-h-[600px]"
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100/50 dark:border-gray-800/50">
+                    <div className={`flex items-center justify-between p-6 border-b ${
+                      actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
+                    }`}>
                       <button
                         onClick={() => setCurrentView('profile')}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        className={`flex items-center gap-2 transition-colors ${
+                          actualTheme === 'dark' 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="text-sm font-inter">Volver</span>
                       </button>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 font-inter">
+                      <h3 className={`text-lg font-bold font-inter ${
+                        actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                      }`}>
                         Foto de perfil
                       </h3>
                       <button
                         onClick={() => setCurrentView('photo-options')}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        className={`flex items-center gap-2 transition-colors ${
+                          actualTheme === 'dark' 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
                       >
                         <Edit2 className="w-4 h-4" />
                         <span className="text-sm font-inter">Editar</span>
@@ -1465,7 +1714,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         <img
                           src={previewImage || userData?.profileImage}
                           alt="Profile Full Size"
-                          className="max-w-full max-h-[450px] object-contain rounded-2xl shadow-2xl ring-1 ring-gray-200 dark:ring-gray-700"
+                          className={`max-w-full max-h-[450px] object-contain rounded-2xl shadow-2xl ring-1 ${
+                            actualTheme === 'dark' ? 'ring-gray-700' : 'ring-gray-200'
+                          }`}
                         />
                       ) : (
                         <div className="w-80 h-80 bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-6xl font-bold rounded-2xl font-inter shadow-2xl">

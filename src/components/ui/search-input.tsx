@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, X } from "lucide-react"
 import { Button } from "./button"
+import { useTheme } from "@/contexts/ThemeContext"
 
 interface SearchInputProps {
   onSearch?: (query: string) => void
@@ -14,6 +15,7 @@ export function SearchInput({ onSearch, placeholder = "Buscar proyectos..." }: S
   const [isExpanded, setIsExpanded] = useState(false)
   const [query, setQuery] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
+  const { actualTheme } = useTheme()
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -53,7 +55,12 @@ export function SearchInput({ onSearch, placeholder = "Buscar proyectos..." }: S
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(true)}
-              className="hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200"
+              className={`p-2 rounded-xl transition-all duration-300 backdrop-blur-sm border ${
+                actualTheme === 'dark'
+                  ? 'bg-white/10 hover:bg-white/20 border-white/20 hover:border-white/40 text-white/90 hover:text-white'
+                  : 'bg-black/10 hover:bg-black/20 border-black/20 hover:border-black/40 text-gray-900/90 hover:text-gray-900'
+              }`}
+              aria-label="Abrir búsqueda"
             >
               <Search className="w-4 h-4" />
             </Button>
@@ -65,9 +72,15 @@ export function SearchInput({ onSearch, placeholder = "Buscar proyectos..." }: S
             animate={{ opacity: 1, width: 350 }}
             exit={{ opacity: 0, width: 40 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="relative flex items-center bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg"
+            className={`relative flex items-center rounded-xl shadow-xl border backdrop-blur-xl ${
+              actualTheme === 'dark'
+                ? 'bg-black/60 border-white/30'
+                : 'bg-white/90 border-gray-200'
+            }`}
           >
-            <Search className="w-4 h-4 ml-3 text-neutral-500" />
+            <Search className={`w-4 h-4 ml-3 ${
+              actualTheme === 'dark' ? 'text-white/70' : 'text-gray-500'
+            }`} />
             <input
               ref={inputRef}
               type="text"
@@ -75,7 +88,11 @@ export function SearchInput({ onSearch, placeholder = "Buscar proyectos..." }: S
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder={placeholder}
-              className="flex-1 px-3 py-2 bg-transparent border-none outline-none text-sm placeholder-neutral-500 dark:placeholder-neutral-400"
+              className={`flex-1 px-3 py-2.5 bg-transparent border-none outline-none text-sm font-medium ${
+                actualTheme === 'dark'
+                  ? 'text-white placeholder-white/50'
+                  : 'text-gray-900 placeholder-gray-500'
+              }`}
             />
             <Button
               variant="ghost"
@@ -84,7 +101,12 @@ export function SearchInput({ onSearch, placeholder = "Buscar proyectos..." }: S
                 setIsExpanded(false)
                 setQuery("")
               }}
-              className="mr-1 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className={`mr-2 p-1.5 rounded-lg transition-all duration-200 ${
+                actualTheme === 'dark'
+                  ? 'hover:bg-white/20 text-white/70 hover:text-white'
+                  : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+              }`}
+              aria-label="Cerrar búsqueda"
             >
               <X className="w-4 h-4" />
             </Button>
