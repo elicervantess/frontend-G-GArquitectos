@@ -1,9 +1,10 @@
 "use client"
 
+import "@/styles/performance.css"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect } from "react"
-import { ArrowRight, Star, Users, Award, Building, ChevronLeft, ChevronRight, Leaf, House } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { ArrowRight, Star, Users, Award, Building, ChevronLeft, ChevronRight, Leaf, House, Facebook, Linkedin, Instagram } from "lucide-react"
 import { OptimizedImage } from "@/components/ui/optimized-image"
 
 // Datos de los proyectos
@@ -54,91 +55,121 @@ const projects = [
   }
 ]
 
-export default function Home() {
+export default function HomePage() {
+  const [currentSection, setCurrentSection] = useState('proyectos') // Iniciar en proyectos
   const [currentProject, setCurrentProject] = useState(0)
-  const [currentCarouselProject, setCurrentCarouselProject] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isCarouselLoading, setIsCarouselLoading] = useState(false)
-  const [currentSection, setCurrentSection] = useState('inicio')
+  const [isMounted, setIsMounted] = useState(false)
   
   // Valores optimizados estáticos para evitar hydration mismatch
   const imageQuality = 85
   const imageSizes = "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
 
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Secciones de navegación
   const sections = [
-    { id: 'inicio', name: 'Inicio' },
-    { id: 'proyectos', name: 'Proyectos' },
-    { id: 'servicios', name: 'Servicios' },
-    { id: 'sobre-nosotros', name: 'Nosotros' },
+    { id: 'proyectos', name: 'Proyectos' }, // Hero es proyectos pero también inicio
+    { id: 'nosotros', name: 'Nosotros' },
+    { id: 'clientes', name: 'Clientes' },
+    { id: 'reseñas', name: 'Reseñas' },
     { id: 'contacto', name: 'Contacto' }
   ]
 
-  // Auto-play del carousel (opcional)
+  // AUTOPLAY OPTIMIZADO - Sin interferir con performance
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentProject((prev) => (prev + 1) % projects.length)
-    }, 8000) // Cambia cada 8 segundos
+    }, 7000) // Reducido a 7 segundos para más dinamismo
 
     return () => clearInterval(interval)
-  }, [])
+  }, []) // Sin dependencias para evitar re-creación
 
-  // Detectar sección actual basada en scroll
+  // PRELOAD CRÍTICO - Imágenes del carrusel
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
+    if (isMounted && projects.length > 0) {
+      // Precargar las primeras 2 imágenes INMEDIATAMENTE
+      const priorityImages = projects.slice(0, 2)
+      priorityImages.forEach((project) => {
+        const img = new Image()
+        img.src = project.image
+        img.loading = 'eager'
+      })
 
-      if (scrollY < windowHeight * 0.5) {
-        setCurrentSection('inicio')
-      } else if (scrollY < windowHeight * 1.5) {
-        setCurrentSection('proyectos')
-      } else if (scrollY < windowHeight * 2.5) {
-        setCurrentSection('servicios')
-      } else if (scrollY < windowHeight * 3.5) {
-        setCurrentSection('sobre-nosotros')
-      } else {
-        setCurrentSection('contacto')
+      // Precargar el resto después de 500ms
+      const timer = setTimeout(() => {
+        projects.slice(2).forEach((project) => {
+          const img = new Image()
+          img.src = project.image
+          img.loading = 'lazy'
+        })
+      }, 500)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isMounted, projects])
+
+  // SCROLL LISTENER ULTRA-OPTIMIZADO - ZERO LAG
+  useEffect(() => {
+    let ticking = false
+    let lastScrollY = 0
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY
+          
+          // Solo actualizar si hay cambio significativo (evita renders innecesarios)
+          if (Math.abs(scrollY - lastScrollY) > 50) {
+            const windowHeight = window.innerHeight
+            let newSection = 'proyectos' // Proyectos es el inicio
+
+            // Ajustar breakpoints para las nuevas secciones
+            if (scrollY >= windowHeight * 3.5) {
+              newSection = 'contacto'
+            } else if (scrollY >= windowHeight * 2.5) {
+              newSection = 'reseñas'
+            } else if (scrollY >= windowHeight * 1.5) {
+              newSection = 'clientes'
+            } else if (scrollY >= windowHeight * 0.8) {
+              newSection = 'nosotros'
+            }
+
+            // Solo actualizar si la sección cambió
+            setCurrentSection(prev => prev !== newSection ? newSection : prev)
+            lastScrollY = scrollY
+          }
+          
+          ticking = false
+        })
+        ticking = true
       }
     }
 
-    window.addEventListener('scroll', handleScroll)
+    // Usar scroll pasivo para mejor rendimiento
+    window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // Ejecutar una vez al montar
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const nextProject = () => {
-    if (isLoading) return
-    setIsLoading(true)
+  // FUNCIONES OPTIMIZADAS CON useCallback - ZERO RE-RENDERS
+  const nextProject = useCallback(() => {
     setCurrentProject((prev) => (prev + 1) % projects.length)
-    setTimeout(() => setIsLoading(false), 500)
-  }
+  }, [])
 
-  const prevProject = () => {
-    if (isLoading) return
-    setIsLoading(true)
+  const prevProject = useCallback(() => {
     setCurrentProject((prev) => (prev - 1 + projects.length) % projects.length)
-    setTimeout(() => setIsLoading(false), 500)
-  }
-
-  // Funciones para el carrusel de proyectos - INSTANT SNAP PERFORMANCE
-  const nextCarouselProject = () => {
-    setCurrentCarouselProject((prev) => (prev + 1) % projects.length)
-    // Cambio instantáneo sin delays ni loading states
-  }
-
-  const prevCarouselProject = () => {
-    setCurrentCarouselProject((prev) => (prev - 1 + projects.length) % projects.length)
-    // Cambio instantáneo sin delays ni loading states
-  }
+  }, [])
 
   const currentProjectData = projects[currentProject]
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Carousel Section */}
-      <section id="inicio" className="relative h-screen overflow-hidden">
+    <div className="min-h-screen scroll-optimized">
+      {/* Hero Carousel Section - Proyectos y también funciona como Inicio */}
+      <section id="proyectos" className="relative h-screen overflow-hidden composite-layer">
         {/* Background Images - All Stacked */}
         <div className="absolute inset-0">
           {projects.map((project, index) => (
@@ -312,16 +343,14 @@ export default function Home() {
         {/* Navigation Arrows */}
         <button
           onClick={prevProject}
-          disabled={isLoading}
-          className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:border-white/40 transition-all duration-300 group disabled:opacity-50"
+          className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:border-white/40 transition-all duration-300 group"
         >
           <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 text-white group-hover:scale-110 transition-transform" />
         </button>
 
         <button
           onClick={nextProject}
-          disabled={isLoading}
-          className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:border-white/40 transition-all duration-300 group disabled:opacity-50"
+          className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:border-white/40 transition-all duration-300 group"
         >
           <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-white group-hover:scale-110 transition-transform" />
         </button>
@@ -331,13 +360,7 @@ export default function Home() {
           {projects.map((_, index) => (
             <button
               key={index}
-              onClick={() => {
-                if (!isLoading) {
-                  setIsLoading(true)
-                  setCurrentProject(index)
-                  setTimeout(() => setIsLoading(false), 500)
-                }
-              }}
+              onClick={() => setCurrentProject(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 index === currentProject
                   ? 'bg-white scale-125'
@@ -364,7 +387,7 @@ export default function Home() {
               {/* Texto de sección */}
               <div className="text-right">
                 <p className="text-white font-inter font-semibold text-base capitalize">
-                  {sections.find(section => section.id === currentSection)?.name || 'Inicio'}
+                  {sections.find(section => section.id === currentSection)?.name || 'Proyectos'}
                 </p>
               </div>
             </div>
@@ -382,481 +405,587 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Proyectos Section */}
-      <section id="proyectos" className="py-20 bg-white dark:bg-slate-900 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5 dark:opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-gray-300 to-gray-500 dark:from-gray-600 dark:to-gray-800 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-slate-400 to-gray-600 dark:from-slate-600 dark:to-gray-700 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      {/* Nosotros Section */}
+      <section id="nosotros" className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center mb-16"
           >
-            {/* Subtitle */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="mb-4"
-            >
-              <span className="inline-block px-4 py-2 text-sm font-semibold tracking-wider uppercase rounded-full bg-gradient-to-r from-gray-100 to-gray-200 dark:from-white dark:to-gray-100 text-gray-800 dark:text-black border border-gray-300 dark:border-gray-300">
-                Portafolio
-              </span>
-            </motion.div>
-
-            {/* Main Title */}
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 relative"
-            >
-              <span className="bg-gradient-to-r from-slate-900 via-gray-800 to-slate-900 dark:from-white dark:via-white dark:to-white bg-clip-text text-transparent leading-tight">
-                Nuestros
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-gray-700 via-slate-800 to-gray-700 dark:from-white dark:via-white dark:to-white bg-clip-text text-transparent leading-tight">
-                Proyectos
-              </span>
-              
-              {/* Decorative elements */}
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                whileInView={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 1, delay: 0.8, type: "spring", stiffness: 200 }}
-                viewport={{ once: true }}
-                className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-600 dark:from-gray-300 dark:to-gray-500 rounded-full opacity-80"
-              ></motion.div>
-              <motion.div
-                initial={{ scale: 0, rotate: 180 }}
-                whileInView={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 1, delay: 1, type: "spring", stiffness: 200 }}
-                viewport={{ once: true }}
-                className="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-br from-gray-500 to-slate-700 dark:from-gray-400 dark:to-gray-200 rounded-full opacity-70"
-              ></motion.div>
-            </motion.h2>
-
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              viewport={{ once: true }}
-              className="text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed font-light"
-            >
-              Descubre nuestra cartera de proyectos arquitectónicos que 
-              <span className="font-medium text-gray-800 dark:text-gray-200"> transforman espacios </span>
-              y crean 
-              <span className="font-medium text-slate-700 dark:text-slate-300"> experiencias únicas</span>
-            </motion.p>
-
-            {/* Decorative line */}
-            <motion.div
-              initial={{ width: 0 }}
-              whileInView={{ width: "12rem" }}
-              transition={{ duration: 1, delay: 0.7 }}
-              viewport={{ once: true }}
-              className="h-1 bg-gradient-to-r from-gray-500 to-slate-700 dark:from-gray-400 dark:to-gray-200 mx-auto mt-8 rounded-full"
-            ></motion.div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+              Sobre Nosotros
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-12">
+              Conoce al equipo de arquitectos expertos que transforman ideas en realidades extraordinarias
+            </p>
+            
+            {/* Stats Section - Moved here and increased size by 20% */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+              {[
+                { number: "150+", label: "Proyectos" },
+                { number: "15+", label: "Años" },
+                { number: "50+", label: "Clientes" },
+                { number: "25+", label: "Premios" }
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2">
+                    {stat.number}
+                  </div>
+                  <div className="text-lg text-slate-600 dark:text-slate-400 font-medium">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Projects Carousel - Professional Premium Design */}
-          <div className="relative w-full max-w-7xl mx-auto px-4">
-            {/* Carousel Container with Advanced Styling */}
-            <div className="relative">
+          {/* Architects Team - Simple Layout without Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-16 max-w-5xl mx-auto">
+            {[
+              {
+                id: 1,
+                name: "Gonzalo Sanchez",
+                title: "Arquitecto Principal",
+                image: "/images/architects/gonzalo.jpg",
+                bio: "Con más de 15 años de experiencia en diseño arquitectónico, especializado en proyectos residenciales y comerciales de alta gama.",
+                social: {
+                  facebook: "https://facebook.com/gonzalo.garcia",
+                  linkedin: "https://linkedin.com/in/gonzalo.garcia",
+                  instagram: "https://instagram.com/gonzalo.garcia"
+                }
+              },
+              {
+                id: 2,
+                name: "Grethel Cervantes",
+                title: "Arquitecta Senior",
+                image: "/images/architects/grethel.jpg",
+                bio: "Especialista en diseño sostenible y arquitectura bioclimática, con enfoque en la innovación y funcionalidad en cada proyecto.",
+                social: {
+                  facebook: "https://facebook.com/grethel.morales",
+                  linkedin: "https://linkedin.com/in/grethel.morales",
+                  instagram: "https://instagram.com/grethel.morales"
+                }
+              }
+            ].map((architect, index) => (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ 
-                  duration: 1, 
-                  delay: 0.3,
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 15
-                }}
-                viewport={{ once: true, margin: "-100px" }}
-                className="relative overflow-hidden"
+                key={architect.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.3 }}
+                viewport={{ once: true, amount: 0.3 }}
+                className="text-center"
               >
-                {/* Premium Cards Container with Perspective */}
-                <div className="relative perspective-1000">
-                  <div 
-                    className="flex will-change-transform transform-gpu"
-                    style={{
-                      transform: `translate3d(calc(-${currentCarouselProject * 100}% + ${currentCarouselProject * 48}px), 0, 0)`,
-                      // SIN TRANSICIONES - Cambio instantáneo natural
-                    }}
+                {/* Photo - Much Larger and rectangular - AQUÍ SE EDITA EL TAMAÑO */}
+                <motion.div 
+                  className="flex justify-center mb-8"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: index * 0.3 + 0.2 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  {/* TAMAÑO DE LA FOTO: w-96 h-[32rem] = 384x512px */}
+                  <div className="w-96 h-[32rem] relative overflow-hidden rounded-2xl shadow-2xl">
+                    <OptimizedImage
+                      src={architect.image}
+                      alt={`${architect.name} - ${architect.title}`}
+                      width={384}
+                      height={512}
+                      className="object-cover w-full h-full hover:scale-110 transition-transform duration-700 ease-out"
+                      priority={index === 0}
+                      quality={90}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                  </div>
+                </motion.div>
+                
+                {/* Name and Title */}
+                <motion.div 
+                  className="mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.3 + 0.4 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <h3 className="text-3xl font-bold text-black dark:text-white mb-3">
+                    {architect.name}
+                  </h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                    {architect.title}
+                  </p>
+                </motion.div>
+                
+                {/* Social Media - Smaller icons with monochrome palette */}
+                <motion.div 
+                  className="flex justify-center space-x-3 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.3 + 0.6 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <motion.a
+                    href={architect.social.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.2, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-8 h-8 bg-gray-200 dark:bg-gray-700 hover:bg-black dark:hover:bg-white rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-white dark:hover:text-black transition-all duration-300"
                   >
-                    {projects.map((project, index) => {
-                      const isActive = index === currentCarouselProject;
-                      
-                      return (
-                        <div
-                          key={project.id}
-                          className="relative flex-shrink-0 w-full max-w-5xl mx-auto"
-                          style={{
-                            marginRight: index < projects.length - 1 ? '48px' : '0'
-                          }}
-                        >
-                          {/* INSTANT Performance Card - Zero Lag */}
-                          <div 
-                            className="relative w-full h-[500px] rounded-3xl overflow-hidden cursor-pointer will-change-transform transform-gpu"
-                            style={{
-                              // Propiedades fijas - Sin transiciones
-                              boxShadow: isActive 
-                                ? '0 25px 80px -15px rgba(0,0,0,0.4)' 
-                                : '0 15px 40px -10px rgba(0,0,0,0.3)',
-                              transform: isActive ? 'scale(1)' : 'scale(0.95)',
-                              opacity: isActive ? 1 : 0.7,
-                              // SIN TRANSITION - Cambio instantáneo
-                            }}
-                          >
-                            {/* Optimized Image Container */}
-                            <div className="absolute inset-0">
-                              <OptimizedImage
-                                src={project.image}
-                                alt={`${project.title} - Architectural Project`}
-                                width={1200}
-                                height={500}
-                                className="object-cover w-full h-full will-change-transform transform-gpu"
-                                priority={isActive}
-                                quality={90}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
-                              />
-                            </div>
-                            
-                            {/* Instant Info Container */}
-                            <div className="absolute bottom-8 right-8 text-right text-white z-20">
-                              <div 
-                                className="space-y-2 will-change-transform transform-gpu"
-                                style={{
-                                  // Propiedades fijas sin transiciones
-                                  opacity: isActive ? 1 : 0.9,
-                                  transform: isActive ? 'scale(1)' : 'scale(0.95)',
-                                  // SIN TRANSITION - Cambio instantáneo
-                                }}
-                              >
-                                {/* Instant Title - No Transitions */}
-                                <h3 
-                                  className="font-black leading-none drop-shadow-2xl will-change-transform transform-gpu"
-                                  style={{
-                                    // Tamaño fijo sin transiciones
-                                    fontSize: isActive ? '2.25rem' : '1.875rem',
-                                    color: isActive ? '#ffffff' : 'rgba(255,255,255,0.95)',
-                                    // SIN TRANSITION - Cambio instantáneo natural
-                                  }}
-                                >
-                                  {project.title.split(' ').slice(0, 2).join(' ').toUpperCase()}.
-                                </h3>
-                                
-                                {/* Instant Subtitle - No Transitions */}
-                                <p 
-                                  className="text-white/80 drop-shadow-lg leading-relaxed will-change-transform transform-gpu"
-                                  style={{
-                                    // Propiedades fijas sin transiciones
-                                    fontSize: isActive ? '1.125rem' : '0.875rem',
-                                    fontWeight: isActive ? '500' : '400',
-                                    // SIN TRANSITION - Cambio instantáneo natural
-                                  }}
-                                >
-                                  {project.category} • {project.title.split(' ').slice(2).join(' ')}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            {/* Minimal Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-                          </div>
-                        </div>
-                      )
-                    })}
+                    <Facebook size={16} />
+                  </motion.a>
+                  
+                  <motion.a
+                    href={architect.social.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.2, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-8 h-8 bg-gray-200 dark:bg-gray-700 hover:bg-black dark:hover:bg-white rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-white dark:hover:text-black transition-all duration-300"
+                  >
+                    <Linkedin size={16} />
+                  </motion.a>
+                  
+                  <motion.a
+                    href={architect.social.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.2, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-8 h-8 bg-gray-200 dark:bg-gray-700 hover:bg-black dark:hover:bg-white rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-white dark:hover:text-black transition-all duration-300"
+                  >
+                    <Instagram size={16} />
+                  </motion.a>
+                </motion.div>
+                
+                {/* Biography */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.3 + 0.8 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto">
+                    {architect.bio}
+                  </p>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Company Values Section - Nosotros, Visión, Misión */}
+          <div className="mt-32 mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {[
+                {
+                  icon: (
+                    <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h1m4 0h1" />
+                    </svg>
+                  ),
+                  title: "NOSOTROS",
+                  description: "Somos una empresa con más de 29 años, con un equipo calificado y experimentado en constante evolución y crecimiento."
+                },
+                {
+                  icon: (
+                    <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  ),
+                  title: "VISIÓN",
+                  description: "Ser la empresa líder en el mercado nacional en la Construcción e Implementaciones y Arquitectura Publicitaria."
+                },
+                {
+                  icon: (
+                    <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                    </svg>
+                  ),
+                  title: "MISIÓN",
+                  description: "Somos una organización comprometida en alcanzar la completa satisfacción de nuestros clientes cuidando la calidad."
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  className="text-center"
+                >
+                  {/* Icon Circle */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 + 0.1 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="w-32 h-32 mx-auto mb-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
+                  >
+                    {item.icon}
+                  </motion.div>
+                  
+                  {/* Title */}
+                  <motion.h3
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="text-2xl font-bold text-black dark:text-white mb-6 tracking-wide"
+                  >
+                    {item.title}
+                  </motion.h3>
+                  
+                  {/* Description */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto text-base"
+                  >
+                    {item.description}
+                  </motion.p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Nuestros Valores Section - Company Values with Icons */}
+          <div className="mt-32 mb-20">
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.3 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-6">
+                NUESTROS VALORES
+              </h2>
+            </motion.div>
+
+            {/* Top Row - 5 Values Labels */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
+              {[
+                { title: "ÉTICA" },
+                { title: "HONESTIDAD" },
+                { title: "PUNTUALIDAD" },
+                { title: "LIDERAZGO" },
+                { title: "SEGURIDAD" }
+              ].map((value, index) => (
+                <motion.div
+                  key={value.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  className="text-center"
+                >
+                  <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
+                    {value.title}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Center Row - 5 Icon Circles */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
+              {[
+                {
+                  icon: (
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  )
+                },
+                {
+                  icon: (
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                    </svg>
+                  )
+                },
+                {
+                  icon: (
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )
+                },
+                {
+                  icon: (
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  )
+                },
+                {
+                  icon: (
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  )
+                }
+              ].map((value, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  className="text-center"
+                >
+                  {/* Icon Circle with Decorative Border */}
+                  <div className="relative mx-auto">
+                    {/* Outer decorative ring */}
+                    <div className="w-32 h-32 mx-auto rounded-full border-4 border-gray-200 dark:border-gray-700 flex items-center justify-center relative">
+                      {/* Inner circle with icon */}
+                      <div className="w-24 h-24 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-black dark:hover:text-white transition-all duration-300">
+                        {value.icon}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Bottom Row - 4 Values Labels */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-3xl mx-auto">
+              {[
+                { title: "RESPETO" },
+                { title: "COMPROMISO" },
+                { title: "TOLERANCIA" },
+                { title: "RESPONSABILIDAD" }
+              ].map((value, index) => (
+                <motion.div
+                  key={value.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  className="text-center"
+                >
+                  <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
+                    {value.title}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Clientes Section */}
+      <section id="clientes" className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+              Nuestros Clientes
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Marcas reconocidas que confían en nuestra experiencia y calidad arquitectónica
+            </p>
+          </motion.div>
+
+          {/* Logos Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-80">
+            {[
+              { name: "Microsoft", logo: "M" },
+              { name: "Google", logo: "G" },
+              { name: "Apple", logo: "A" },
+              { name: "Tesla", logo: "T" },
+              { name: "Adobe", logo: "Ad" },
+              { name: "Netflix", logo: "N" },
+              { name: "Amazon", logo: "Am" },
+              { name: "Meta", logo: "Me" },
+              { name: "Spotify", logo: "S" },
+              { name: "Uber", logo: "U" },
+              { name: "Airbnb", logo: "Ab" },
+              { name: "PayPal", logo: "P" }
+            ].map((client, index) => (
+              <motion.div
+                key={client.name}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                viewport={{ once: true, amount: 0.5 }}
+                whileHover={{ scale: 1.1, opacity: 1 }}
+                className="flex items-center justify-center p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 group border border-gray-200 dark:border-gray-700"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-xl flex items-center justify-center text-white dark:text-black font-bold text-lg group-hover:scale-110 transition-transform duration-300">
+                  {client.logo}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="mt-16 text-center"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">98%</div>
+                <div className="text-slate-600 dark:text-slate-400">Satisfacción del Cliente</div>
+              </div>
+              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">50+</div>
+                <div className="text-slate-600 dark:text-slate-400">Empresas Fortune 500</div>
+              </div>
+              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">24/7</div>
+                <div className="text-slate-600 dark:text-slate-400">Soporte Personalizado</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Reseñas Section */}
+      <section id="reseñas" className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+              Lo que dicen nuestros clientes
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Testimonios reales de proyectos que han transformado espacios y superado expectativas
+            </p>
+          </motion.div>
+
+          {/* Reviews Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: "María González",
+                company: "Directora General, Innovate Corp",
+                review: "GYG Arquitectos transformó completamente nuestra oficina central. El diseño no solo es espectacular, sino que ha mejorado significativamente la productividad de nuestro equipo.",
+                rating: 5,
+                project: "Oficinas Corporativas Innovate"
+              },
+              {
+                name: "Carlos Mendoza",
+                company: "CEO, TechStart Solutions",
+                review: "La atención al detalle y la capacidad de entender nuestra visión fue excepcional. Nuestro nuevo campus es el reflejo perfecto de nuestra cultura empresarial.",
+                rating: 5,
+                project: "Campus Tecnológico TechStart"
+              },
+              {
+                name: "Ana Sofía Ruiz",
+                company: "Propietaria, Villa Moderna",
+                review: "Hicieron realidad el hogar de nuestros sueños. Cada espacio está diseñado con propósito y belleza. La experiencia fue increíble de principio a fin.",
+                rating: 5,
+                project: "Residencia Familiar"
+              },
+              {
+                name: "Roberto Silva",
+                company: "Director, Green Building Initiative",
+                review: "Su enfoque en sostenibilidad y tecnología verde superó nuestras expectativas. El edificio es un ejemplo perfecto de arquitectura responsable.",
+                rating: 5,
+                project: "Torre Eco-Sostenible"
+              },
+              {
+                name: "Lucía Herrera",
+                company: "Gerente, Luxury Hotels Group",
+                review: "El diseño de nuestro hotel boutique es simplemente extraordinario. Los huéspedes constantemente elogian la arquitectura y los espacios únicos.",
+                rating: 5,
+                project: "Hotel Boutique Premium"
+              },
+              {
+                name: "Diego Ramírez",
+                company: "Fundador, Creative Studios",
+                review: "Entendieron perfectamente nuestra necesidad de espacios creativos y funcionales. Nuestro estudio ahora inspira a todo el equipo diariamente.",
+                rating: 5,
+                project: "Estudio Creativo Multimedia"
+              }
+            ].map((review, index) => (
+              <motion.div
+                key={review.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+              >
+                {/* Stars */}
+                <div className="flex mb-4">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+                  ))}
+                </div>
+                
+                {/* Review Text */}
+                <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+                  "{review.review}"
+                </p>
+                
+                {/* Author Info */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-full flex items-center justify-center text-white dark:text-black font-bold">
+                      {review.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white">
+                        {review.name}
+                      </h4>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        {review.company}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Proyecto: {review.project}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
-            </div>
-            
-            {/* INSTANT Navigation - PREV */}
-            <button
-              onClick={prevCarouselProject}
-              disabled={currentCarouselProject === 0}
-              className="
-                absolute left-0 top-1/2 -translate-y-1/2 z-50
-                group flex items-center gap-3
-                bg-black/20 hover:bg-black/40 
-                backdrop-blur-2xl border border-white/20 hover:border-white/40
-                px-6 py-4 rounded-r-2xl text-white font-bold text-lg
-                disabled:opacity-30 disabled:cursor-not-allowed
-                shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)]
-                will-change-transform transform-gpu
-                transition-colors duration-200
-                hover:scale-105 active:scale-95
-              "
-            >
-              <ChevronLeft className="w-6 h-6 group-hover:scale-110 transition-transform duration-150 drop-shadow-lg will-change-transform transform-gpu" />
-              <span className="font-black tracking-wider">PREV</span>
-            </button>
-
-            {/* INSTANT Navigation - NEXT */}
-            <button
-              onClick={nextCarouselProject}
-              disabled={currentCarouselProject === projects.length - 1}
-              className="
-                absolute right-0 top-1/2 -translate-y-1/2 z-50
-                group flex items-center gap-3
-                bg-black/20 hover:bg-black/40 
-                backdrop-blur-2xl border border-white/20 hover:border-white/40
-                px-6 py-4 rounded-l-2xl text-white font-bold text-lg
-                disabled:opacity-30 disabled:cursor-not-allowed
-                shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)]
-                will-change-transform transform-gpu
-                transition-colors duration-200
-                hover:scale-105 active:scale-95
-              "
-            >
-              <span className="font-black tracking-wider">NEXT</span>
-              <ChevronRight className="w-6 h-6 group-hover:scale-110 transition-transform duration-150 drop-shadow-lg will-change-transform transform-gpu" />
-            </button>
-            
-            {/* Optimized Progress Indicator */}
-            <div className="flex justify-center items-center gap-4 mt-12">
-              <div className="flex gap-3">
-                {projects.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setCurrentCarouselProject(index)
-                    }}
-                    style={{
-                      // Cambio instantáneo de dimensiones
-                      width: index === currentCarouselProject ? '3rem' : '1rem',
-                      height: '1rem',
-                      background: index === currentCarouselProject 
-                        ? 'linear-gradient(to right, #1f2937, #111827)' 
-                        : 'rgba(156, 163, 175, 0.6)',
-                      // Solo transición suave en colores, NO en posición
-                      transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
-                      transform: 'scale(1)', // Siempre fijo
-                      boxShadow: index === currentCarouselProject 
-                        ? '0 4px 14px 0 rgba(0, 0, 0, 0.3)' 
-                        : '0 2px 8px 0 rgba(0, 0, 0, 0.2)'
-                    }}
-                    className="relative overflow-hidden rounded-full cursor-pointer hover:scale-125 will-change-transform transform-gpu"
-                  >
-                    {index === currentCarouselProject && (
-                      <div
-                        className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-pulse"
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Optimized Progress Counter */}
-              <div className="flex items-center gap-2 ml-6 text-gray-600 dark:text-gray-400 font-medium">
-                <span className="text-2xl font-bold text-gray-800 dark:text-white">
-                  {String(currentCarouselProject + 1).padStart(2, '0')}
-                </span>
-                <span>/</span>
-                <span>{String(projects.length).padStart(2, '0')}</span>
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Servicios Section */}
-      <section id="servicios" className="py-20 bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center mt-16"
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-              Nuestros Servicios
-            </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Ofrecemos servicios integrales de arquitectura y diseño para convertir tus ideas en realidad
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
+              ¿Quieres ser nuestro próximo cliente satisfecho?
             </p>
+            <Button className="bg-gradient-to-r from-gray-700 to-slate-900 hover:from-gray-800 hover:to-black dark:from-gray-300 dark:to-gray-500 dark:hover:from-gray-200 dark:hover:to-gray-400 text-white dark:text-black px-8 py-3 text-lg font-semibold transition-all duration-300">
+              Iniciar Mi Proyecto
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Building,
-                title: "Arquitectura Residencial",
-                description: "Diseño y construcción de viviendas únicas que reflejan tu estilo de vida y personalidad.",
-                features: ["Diseño personalizado", "Sostenibilidad", "Tecnología inteligente"]
-              },
-              {
-                icon: Star,
-                title: "Arquitectura Comercial",
-                description: "Espacios comerciales que maximizan la funcionalidad y crean experiencias memorables.",
-                features: ["Espacios optimizados", "Branding arquitectónico", "ROI maximizado"]
-              },
-              {
-                icon: Leaf,
-                title: "Diseño Sostenible",
-                description: "Arquitectura eco-friendly con certificación LEED y tecnologías verdes.",
-                features: ["Certificación LEED", "Eficiencia energética", "Materiales sostenibles"]
-              },
-              {
-                icon: Users,
-                title: "Consultoría Arquitectónica",
-                description: "Asesoramiento especializado para optimizar tus proyectos arquitectónicos.",
-                features: ["Análisis de viabilidad", "Optimización de costos", "Gestión de proyectos"]
-              },
-              {
-                icon: Award,
-                title: "Interiorismo",
-                description: "Diseño de interiores que complementa perfectamente la arquitectura exterior.",
-                features: ["Diseño integral", "Mobiliario personalizado", "Iluminación especializada"]
-              },
-              {
-                icon: House,
-                title: "Remodelaciones",
-                description: "Transformación de espacios existentes con soluciones innovadoras y creativas.",
-                features: ["Renovación completa", "Ampliaciones", "Modernización"]
-              }
-            ].map((service, index) => (
-              <motion.div
-                key={service.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 group border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <service.icon className="w-8 h-8 text-white dark:text-black" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-                  {service.title}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-                  {service.description}
-                </p>
-                <ul className="space-y-2">
-                  {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-sm text-slate-600 dark:text-slate-400">
-                      <div className="w-1.5 h-1.5 bg-gray-600 dark:bg-gray-400 rounded-full mr-3" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sobre Nosotros Section */}
-      <section id="sobre-nosotros" className="py-20 bg-white dark:bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-              ¿Por qué elegirnos?
-            </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Más de 15 años de experiencia creando espacios que inspiran y perduran en el tiempo
-            </p>
-          </motion.div>
-
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-            {[
-              { number: "150+", label: "Proyectos Completados" },
-              { number: "15+", label: "Años de Experiencia" },
-              { number: "50+", label: "Clientes Satisfechos" },
-              { number: "25+", label: "Premios Ganados" }
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-300 mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-slate-600 dark:text-slate-400 font-medium">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Star,
-                title: "Diseño Premium",
-                description: "Cada proyecto es único, diseñado con atención al detalle y materiales de la más alta calidad para crear espacios excepcionales."
-              },
-              {
-                icon: Users,
-                title: "Equipo Experto",
-                description: "Arquitectos certificados con amplia experiencia en proyectos residenciales, comerciales e institucionales de gran envergadura."
-              },
-              {
-                icon: Award,
-                title: "Premios Reconocidos",
-                description: "Hemos sido galardonados con múltiples premios nacionales e internacionales por nuestro diseño innovador y sostenible."
-              },
-              {
-                icon: Building,
-                title: "Sostenibilidad",
-                description: "Comprometidos con el medio ambiente, utilizamos prácticas eco-friendly y tecnologías verdes en todos nuestros proyectos."
-              },
-              {
-                icon: Leaf,
-                title: "Tecnología Avanzada",
-                description: "Implementamos las últimas tecnologías en diseño 3D, BIM y realidad virtual para visualizar proyectos antes de construir."
-              },
-              {
-                icon: House,
-                title: "Servicio Integral",
-                description: "Desde el concepto inicial hasta la entrega final, ofrecemos un servicio completo que incluye diseño, construcción y seguimiento."
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.8 }}
-                viewport={{ once: true }}
-                className="text-center p-8 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-300 group border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
-              >
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <feature.icon className="w-8 h-8 text-white dark:text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
-                  {feature.title}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -864,10 +993,10 @@ export default function Home() {
       <section id="contacto" className="py-20 bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.3 }}
             className="text-center mb-16"
           >
             <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
@@ -881,10 +1010,10 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Info */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.3 }}
               className="space-y-8"
             >
               <div>
@@ -927,10 +1056,10 @@ export default function Home() {
                   ].map((item, index) => (
                     <motion.div
                       key={item.title}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.05 }}
+                      viewport={{ once: true, amount: 0.5 }}
                       className="flex items-start space-x-4 p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-xl flex items-center justify-center text-white dark:text-black flex-shrink-0">
@@ -955,10 +1084,10 @@ export default function Home() {
 
             {/* Contact Form */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.3 }}
               className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xl"
             >
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">

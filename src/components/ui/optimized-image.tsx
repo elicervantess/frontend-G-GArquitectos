@@ -75,14 +75,15 @@ export function OptimizedImage({
   if (!isMounted) {
     return (
       <div 
-        className={`relative overflow-hidden bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 ${className}`}
+        className={`relative overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}
         style={{ 
-          width: width || '100%', 
-          height: height || '300px',
+          width: typeof width === 'number' ? `${width}px` : width || '100%', 
+          height: typeof height === 'number' ? `${height}px` : height || '300px',
           ...style 
         }}
       >
-        <div className="absolute inset-0 animate-pulse" />
+        {/* Skeleton más simple - no animado */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600" />
       </div>
     )
   }
@@ -92,8 +93,8 @@ export function OptimizedImage({
       <div 
         className={`bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ${className}`}
         style={{ 
-          width: width || '100%', 
-          height: height || '300px',
+          width: typeof width === 'number' ? `${width}px` : width || '100%', 
+          height: typeof height === 'number' ? `${height}px` : height || '300px',
           ...style 
         }}
       >
@@ -113,12 +114,11 @@ export function OptimizedImage({
         priority={shouldPrioritize}
         quality={normalizedQuality}
         sizes={sizes}
-        placeholder={placeholder}
-        blurDataURL={defaultBlurDataURL}
+        placeholder="empty" // Sin blur para mejor rendimiento
         onLoad={handleLoad}
         onError={handleError}
-        loading={shouldPrioritize ? "eager" : "lazy"} // Explícito para evitar hidratación
-        className={`transition-opacity duration-500 ${
+        loading={shouldPrioritize ? "eager" : "lazy"}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         style={{
@@ -127,9 +127,9 @@ export function OptimizedImage({
         }}
       />
       
-      {/* Loading skeleton */}
+      {/* Loading skeleton más simple */}
       {!isLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" />
+        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700" />
       )}
     </div>
   )

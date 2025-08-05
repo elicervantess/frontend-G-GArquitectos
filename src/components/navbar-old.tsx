@@ -1,20 +1,22 @@
 "use client"
 
-import "@/styles/navbar-premium.css"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import { SearchInput } from "@/components/ui/search-input"
 import { AuthModal } from "@/components/auth/auth-modal"
 import { OptimizedAvatar } from "@/components/ui/optimized-avatar"
 import ProfileModal from "@/components/profile-modal"
 import { SettingsModal } from "@/components/settings-modal"
 import TopLoadingBar from "@/components/ui/top-loading-bar"
-import { ScrollIndicator } from "@/components/ui/scroll-indicator"
 import { useAuth } from "@/contexts/AuthContext"
 import { useTheme } from "@/contexts/ThemeContext"
 import { useGoogleAuth } from "@/hooks/useGoogleAuth"
 import { useNavbarUser } from "@/hooks/useOptimizedUser"
-import { Menu, X, User, Settings, LogOut, LogIn, UserPlus, Building, Users, Sun, Moon, Monitor } from "lucide-react"
+import { 
+  Menu, X, User, Settings, LogOut, LogIn, UserPlus, Building, Users, Sun, Moon, Monitor,
+  Home, ImageIcon, UserCheck, Star, MessageCircle, Search, ChevronDown
+} from "lucide-react"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -26,7 +28,10 @@ export function Navbar() {
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login")
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [refreshImageKey, setRefreshImageKey] = useState(0)
-  const [hasRefreshedOnce, setHasRefreshedOnce] = useState(false) // Track si ya hizo refresh por registro
+  const [hasRefreshedOnce, setHasRefreshedOnce] = useState(false)
+  const [activeSection, setActiveSection] = useState('inicio')
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const { isAuthenticated, logout, logoutWithBackend, token } = useAuth()
   const { theme, actualTheme, setTheme, toggleTheme } = useTheme()
@@ -73,47 +78,98 @@ export function Navbar() {
     
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
+      
+      // Detectar sección activa basada en scroll
+      const sections = ['inicio', 'proyectos', 'nosotros', 'clientes', 'reseñas', 'contacto']
+      const scrollPosition = window.scrollY + 100
+      
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i] === 'proyectos' ? 'inicio' : sections[i])
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(sections[i])
+          break
+        }
+      }
     }
+    
     window.addEventListener("scroll", handleScroll)
+    handleScroll() // Ejecutar una vez al montar
     return () => window.removeEventListener("scroll", handleScroll)
   }, [isMounted])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
-      if (!target.closest('.user-menu-container')) {
+      if (!target.closest('.user-menu-container') && !target.closest('.search-container')) {
         setIsUserMenuOpen(false)
+        setIsSearchOpen(false)
       }
     }
 
-    if (isUserMenuOpen) {
+    if (isUserMenuOpen || isSearchOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isUserMenuOpen])
+  }, [isUserMenuOpen, isSearchOpen])
 
+  // Nuevos elementos de navegación actualizados
   const navItems = [
-    { name: "Inicio", href: "#proyectos" }, // Inicio apunta a proyectos (que es el hero)
-    { name: "Proyectos", href: "#proyectos" }, // Proyectos también apunta al hero
-    { name: "Nosotros", href: "#nosotros" },
-    { name: "Clientes", href: "#clientes" },
-    { name: "Reseñas", href: "#reseñas" },
-    { name: "Contacto", href: "#contacto" },
+    { 
+      name: "Inicio", 
+      href: "#inicio", 
+      id: "inicio",
+      icon: Home,
+      description: "Página principal"
+    },
+    { 
+      name: "Proyectos", 
+      href: "#inicio", // Apunta al hero que es la sección de proyectos
+      id: "proyectos",
+      icon: ImageIcon,
+      description: "Carrusel de proyectos"
+    },
+    { 
+      name: "Nosotros", 
+      href: "#sobre-nosotros", 
+      id: "nosotros",
+      icon: UserCheck,
+      description: "Acerca de nosotros"
+    },
+    { 
+      name: "Clientes", 
+      href: "#clientes", 
+      id: "clientes",
+      icon: Users,
+      description: "Nuestros clientes"
+    },
+    { 
+      name: "Reseñas", 
+      href: "#reseñas", 
+      id: "reseñas",
+      icon: Star,
+      description: "Testimonios"
+    },
+    { 
+      name: "Contacto", 
+      href: "#contacto", 
+      id: "contacto",
+      icon: MessageCircle,
+      description: "Contáctanos"
+    },
   ]
 
-  // Función para scroll suave
-  const scrollToSection = (href: string) => {
-    // Si es "Inicio", hacer scroll al top (proyectos)
-    if (href === '#proyectos') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      setIsMobileMenuOpen(false)
+  // Función para scroll suave y refresh en inicio
+  const handleNavigation = useCallback((item: typeof navItems[0]) => {
+    if (item.id === 'inicio') {
+      // Refresh de la página para "Inicio"
+      window.location.reload()
       return
     }
-    
-    const elementId = href.replace('#', '')
+
+    const elementId = item.href.replace('#', '')
     const element = document.getElementById(elementId)
     
     if (element) {
@@ -123,8 +179,13 @@ export function Navbar() {
       })
     }
     
-    // Cerrar menú móvil si está abierto
+    setActiveSection(item.id)
     setIsMobileMenuOpen(false)
+  }, [])
+
+  const handleSearch = (query: string) => {
+    console.log("Búsqueda:", query)
+    // Aquí puedes implementar la lógica de búsqueda
   }
 
   const openAuthModal = (mode: "login" | "register") => {
@@ -190,9 +251,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* Scroll Progress Indicator */}
-      <ScrollIndicator />
-      
       {/* Top Loading Bar */}
       <TopLoadingBar isLoading={isGoogleAuthLoading} color="primary" height={3} />
       
@@ -230,7 +288,6 @@ export function Navbar() {
                 duration: 0.4
               }}
               className="flex items-center space-x-2 cursor-pointer ml-8 group"
-              onClick={() => scrollToSection('#proyectos')}
             >
               <motion.div 
                 className="w-10 h-10 bg-gradient-to-br from-white/95 via-blue-50/80 to-white/90 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/40 backdrop-blur-sm hover:border-blue-200/60 transition-all duration-300"
@@ -271,70 +328,28 @@ export function Navbar() {
                     y: -2,
                     filter: "brightness(1.2)"
                   }}
-                  className={`font-inter font-medium text-base transition-all duration-500 relative group drop-shadow-2xl hover:drop-shadow-xl tracking-wider opacity-95 px-2 py-2 ${
+                  className={`font-inter font-medium text-base transition-all duration-500 relative group drop-shadow-2xl hover:drop-shadow-xl tracking-wider opacity-95 ${
                     actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}
                 >
                   {item.name}
-                  
-                  {/* Animated underline */}
                   <motion.div
-                    className={`absolute -bottom-1 left-1/2 h-0.5 rounded-full origin-center ${
+                    className={`absolute -bottom-1 left-0 h-0.5 rounded-full ${
                       actualTheme === 'dark' 
-                        ? 'bg-gradient-to-r from-transparent via-white to-transparent'
-                        : 'bg-gradient-to-r from-transparent via-gray-900 to-transparent'
+                        ? 'bg-gradient-to-r from-white via-blue-200 to-white'
+                        : 'bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900'
                     }`}
-                    initial={{ width: 0, x: "-50%", opacity: 0 }}
+                    initial={{ width: 0, opacity: 0 }}
                     whileHover={{ 
-                      width: "120%", 
+                      width: "100%", 
                       opacity: 1,
                       boxShadow: actualTheme === 'dark' 
-                        ? "0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4)"
-                        : "0 0 20px rgba(59,130,246,0.8), 0 0 40px rgba(59,130,246,0.4)"
+                        ? "0 0 15px rgba(255,255,255,0.7)"
+                        : "0 0 15px rgba(59,130,246,0.7)"
                     }}
                     transition={{ 
                       duration: 0.4,
-                      ease: [0.25, 0.46, 0.45, 0.94],
-                      boxShadow: { duration: 0.6 }
-                    }}
-                  />
-                  
-                  {/* Glow effect */}
-                  <motion.div
-                    className={`absolute inset-0 rounded-lg ${
-                      actualTheme === 'dark' 
-                        ? 'bg-white/5' 
-                        : 'bg-gray-900/5'
-                    }`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileHover={{ 
-                      opacity: 1, 
-                      scale: 1.1,
-                      filter: actualTheme === 'dark' 
-                        ? "blur(8px)"
-                        : "blur(6px)"
-                    }}
-                    transition={{ 
-                      duration: 0.3,
                       ease: "easeOut"
-                    }}
-                  />
-                  
-                  {/* Text shimmer effect */}
-                  <motion.div
-                    className={`absolute inset-0 rounded-lg ${
-                      actualTheme === 'dark' 
-                        ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent'
-                        : 'bg-gradient-to-r from-transparent via-blue-500/20 to-transparent'
-                    }`}
-                    initial={{ x: "-100%", opacity: 0 }}
-                    whileHover={{ 
-                      x: "100%", 
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{ 
-                      duration: 0.8,
-                      ease: "easeInOut"
                     }}
                   />
                 </motion.button>
@@ -342,7 +357,50 @@ export function Navbar() {
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center space-x-4 mr-8">
+            <div className="hidden lg:flex items-center space-x-4 -ml-32 mr-20">
+              {/* Search Input */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                <SearchInput onSearch={handleSearch} />
+              </motion.div>
+
+              {/* Config Menu - Para todos los usuarios */}
+              <motion.div
+                initial={{ opacity: 0, x: 25 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9, duration: 0.6 }}
+                className="relative config-menu-container"
+              >
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={`p-2 rounded-xl border backdrop-blur-sm transition-all duration-500 ${
+                      isScrolled
+                        ? actualTheme === 'dark'
+                          ? "bg-white/15 hover:bg-white/25 border-white/30 hover:border-white/50"
+                          : "bg-black/15 hover:bg-black/25 border-black/30 hover:border-black/50"
+                        : actualTheme === 'dark'
+                          ? "bg-white/10 hover:bg-white/20 border-white/20 hover:border-white/40 shadow-2xl"
+                          : "bg-black/10 hover:bg-black/20 border-black/20 hover:border-black/40 shadow-xl"
+                    }`}
+                    onClick={() => setIsSettingsModalOpen(true)}
+                    aria-label="Configuración"
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 90 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Settings className={`w-5 h-5 drop-shadow-2xl ${
+                        actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`} />
+                    </motion.div>
+                  </Button>
+                </motion.div>
+
               {/* User Menu */}
               <motion.div 
                 className="relative group user-menu-container"
@@ -550,40 +608,6 @@ export function Navbar() {
                   )}
                 </AnimatePresence>
               </motion.div>
-
-              {/* Config Menu - Para todos los usuarios */}
-              <motion.div
-                initial={{ opacity: 0, x: 25 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.9, duration: 0.6 }}
-                className="relative config-menu-container"
-              >
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className={`p-2 rounded-xl border backdrop-blur-sm transition-all duration-500 ${
-                      isScrolled
-                        ? actualTheme === 'dark'
-                          ? "bg-white/15 hover:bg-white/25 border-white/30 hover:border-white/50"
-                          : "bg-black/15 hover:bg-black/25 border-black/30 hover:border-black/50"
-                        : actualTheme === 'dark'
-                          ? "bg-white/10 hover:bg-white/20 border-white/20 hover:border-white/40 shadow-2xl"
-                          : "bg-black/10 hover:bg-black/20 border-black/20 hover:border-black/40 shadow-xl"
-                    }`}
-                    onClick={() => setIsSettingsModalOpen(true)}
-                    aria-label="Configuración"
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 90 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      <Settings className={`w-5 h-5 drop-shadow-2xl ${
-                        actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`} />
-                    </motion.div>
-                  </Button>
-                </motion.div>
             </div>
 
             {/* Mobile Menu Button */}
