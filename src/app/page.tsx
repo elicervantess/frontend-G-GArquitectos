@@ -584,7 +584,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Company Values Section - Nosotros, Visión, Misión */}
+          {/* Company Values Section - Nosotros, Visión, Misión - CSS Pure Animations */}
           <div className="mt-32 mb-20">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {[
@@ -616,47 +616,29 @@ export default function HomePage() {
                   description: "Somos una organización comprometida en alcanzar la completa satisfacción de nuestros clientes cuidando la calidad."
                 }
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={item.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="text-center"
+                  className="text-center opacity-0 animate-fade-in-up"
+                  style={{ 
+                    animationDelay: `${index * 200}ms`,
+                    animationFillMode: 'forwards'
+                  }}
                 >
                   {/* Icon Circle */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 + 0.1 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="w-32 h-32 mx-auto mb-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
-                  >
+                  <div className="w-32 h-32 mx-auto mb-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
                     {item.icon}
-                  </motion.div>
+                  </div>
                   
                   {/* Title */}
-                  <motion.h3
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="text-2xl font-bold text-black dark:text-white mb-6 tracking-wide"
-                  >
+                  <h3 className="text-2xl font-bold text-black dark:text-white mb-6 tracking-wide">
                     {item.title}
-                  </motion.h3>
+                  </h3>
                   
                   {/* Description */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto text-base"
-                  >
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto text-base">
                     {item.description}
-                  </motion.p>
-                </motion.div>
+                  </p>
+                </div>
               ))}
             </div>
           </div>
@@ -664,17 +646,11 @@ export default function HomePage() {
           {/* Nuestros Valores Section - Company Values with Icons */}
           <div className="mt-32 mb-20">
             {/* Title */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="text-center mb-16"
-            >
+            <div className="text-center mb-16 opacity-0 animate-fade-in-up" style={{ animationFillMode: 'forwards' }}>
               <h2 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-6">
                 NUESTROS VALORES
               </h2>
-            </motion.div>
+            </div>
 
             {/* Top Row - 5 Values Labels */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
@@ -685,18 +661,18 @@ export default function HomePage() {
                 { title: "LIDERAZGO" },
                 { title: "SEGURIDAD" }
               ].map((value, index) => (
-                <motion.div
+                <div
                   key={value.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="text-center"
+                  className="text-center opacity-0 animate-fade-in-up"
+                  style={{ 
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: 'forwards'
+                  }}
                 >
                   <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
                     {value.title}
                   </span>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -739,25 +715,21 @@ export default function HomePage() {
                   )
                 }
               ].map((value, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="text-center"
+                  className="text-center opacity-0 animate-fade-in-scale"
+                  style={{ 
+                    animationDelay: `${index * 100 + 200}ms`,
+                    animationFillMode: 'forwards'
+                  }}
                 >
                   {/* Icon Circle with Decorative Border */}
                   <div className="relative mx-auto">
-                    {/* Outer decorative ring */}
-                    <div className="w-32 h-32 mx-auto rounded-full border-4 border-gray-200 dark:border-gray-700 flex items-center justify-center relative">
-                      {/* Inner circle with icon */}
-                      <div className="w-24 h-24 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-black dark:hover:text-white transition-all duration-300">
-                        {value.icon}
-                      </div>
+                    <div className="w-32 h-32 mx-auto rounded-full border-4 border-gray-200 dark:border-gray-700 flex items-center justify-center relative text-gray-600 dark:text-gray-400">
+                      {value.icon}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -769,18 +741,18 @@ export default function HomePage() {
                 { title: "TOLERANCIA" },
                 { title: "RESPONSABILIDAD" }
               ].map((value, index) => (
-                <motion.div
+                <div
                   key={value.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="text-center"
+                  className="text-center opacity-0 animate-fade-in-up"
+                  style={{ 
+                    animationDelay: `${index * 100 + 500}ms`,
+                    animationFillMode: 'forwards'
+                  }}
                 >
                   <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
                     {value.title}
                   </span>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -788,7 +760,7 @@ export default function HomePage() {
       </section>
 
       {/* Clientes Section */}
-      <section id="clientes" className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
+      <section id="clientes" className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -800,64 +772,224 @@ export default function HomePage() {
             <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
               Nuestros Clientes
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-12">
               Marcas reconocidas que confían en nuestra experiencia y calidad arquitectónica
             </p>
           </motion.div>
 
-          {/* Logos Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-80">
-            {[
-              { name: "Microsoft", logo: "M" },
-              { name: "Google", logo: "G" },
-              { name: "Apple", logo: "A" },
-              { name: "Tesla", logo: "T" },
-              { name: "Adobe", logo: "Ad" },
-              { name: "Netflix", logo: "N" },
-              { name: "Amazon", logo: "Am" },
-              { name: "Meta", logo: "Me" },
-              { name: "Spotify", logo: "S" },
-              { name: "Uber", logo: "U" },
-              { name: "Airbnb", logo: "Ab" },
-              { name: "PayPal", logo: "P" }
-            ].map((client, index) => (
-              <motion.div
-                key={client.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                viewport={{ once: true, amount: 0.5 }}
-                whileHover={{ scale: 1.1, opacity: 1 }}
-                className="flex items-center justify-center p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 group border border-gray-200 dark:border-gray-700"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-xl flex items-center justify-center text-white dark:text-black font-bold text-lg group-hover:scale-110 transition-transform duration-300">
-                  {client.logo}
+          {/* Solo mostrar el carrusel después de la hidratación */}
+          {isMounted && (
+            <>
+              {/* Premium Client Carousel - Single Row with Redirects */}
+              <div className="relative">
+                {/* Enhanced Gradient Masks */}
+                <div className="absolute left-0 top-0 w-40 h-full bg-gradient-to-r from-gray-50 via-gray-50/90 via-gray-50/60 to-transparent dark:from-slate-900 dark:via-slate-900/90 dark:via-slate-900/60 dark:to-transparent z-20" />
+                <div className="absolute right-0 top-0 w-40 h-full bg-gradient-to-l from-gray-50 via-gray-50/90 via-gray-50/60 to-transparent dark:from-slate-900 dark:via-slate-900/90 dark:via-slate-900/60 dark:to-transparent z-20" />
+                
+                {/* Main Carousel Container */}
+                <div className="overflow-hidden py-12">
+                  <motion.div
+                    className="flex gap-12 items-center"
+                    animate={{
+                      x: [0, -2400]
+                    }}
+                    transition={{
+                      x: {
+                        repeat: Infinity,
+                        repeatType: "loop",
+                        duration: 40,
+                        ease: "linear"
+                      }
+                    }}
+                    style={{ width: "max-content" }}
+                  >
+                    {/* Single row with clickable logos */}
+                    {[
+                      { name: "Banco del Bajío", src: "/images/clients/banbajio.png", website: "https://www.bb.com.mx" },
+                      { name: "Charly", src: "/images/clients/charly.png", website: "https://www.charly.mx" },
+                      { name: "Walmart", src: "/images/clients/walmart.png", website: "https://www.walmart.com.mx" },
+                      { name: "Flexi", src: "/images/clients/flexi.png", website: "https://www.flexi.com.mx" },
+                      { name: "La Costeña", src: "/images/clients/la-costena.png", website: "https://www.lacostena.com.mx" },
+                      { name: "OXXO", src: "/images/clients/oxxo.png", website: "https://www.oxxo.com" },
+                      { name: "Telmex", src: "/images/clients/telmex.png", website: "https://www.telmex.com" },
+                      { name: "Telcel", src: "/images/clients/telcel.png", website: "https://www.telcel.com" },
+                      // Duplicamos para crear loop infinito perfecto
+                      { name: "Banco del Bajío", src: "/images/clients/banbajio.png", website: "https://www.bb.com.mx" },
+                      { name: "Charly", src: "/images/clients/charly.png", website: "https://www.charly.mx" },
+                      { name: "Walmart", src: "/images/clients/walmart.png", website: "https://www.walmart.com.mx" },
+                      { name: "Flexi", src: "/images/clients/flexi.png", website: "https://www.flexi.com.mx" },
+                      { name: "La Costeña", src: "/images/clients/la-costena.png", website: "https://www.lacostena.com.mx" },
+                      { name: "OXXO", src: "/images/clients/oxxo.png", website: "https://www.oxxo.com" },
+                      { name: "Telmex", src: "/images/clients/telmex.png", website: "https://www.telmex.com" },
+                      { name: "Telcel", src: "/images/clients/telcel.png", website: "https://www.telcel.com" }
+                    ].map((client, index) => (
+                      <div
+                        key={`${client.name}-${index}`}
+                        className="flex-shrink-0 group cursor-pointer relative"
+                      >
+                        {/* Clickable Container that redirects to company website */}
+                        <a
+                          href={client.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-56 h-32 flex items-center justify-center p-8 rounded-2xl bg-white/50 dark:bg-white backdrop-blur-sm border border-gray-200/30 dark:border-gray-300/50 hover:border-gray-300/60 dark:hover:border-gray-400/70 transition-all duration-500 group-hover:transform group-hover:scale-105 group-hover:shadow-xl group-hover:bg-white/80 dark:group-hover:bg-white"
+                        >
+                          <div className="w-full h-full flex items-center justify-center">
+                            <OptimizedImage
+                              src={client.src}
+                              alt={`${client.name} - Cliente de GYG Arquitectos`}
+                              width={200}
+                              height={120}
+                              className="max-w-full max-h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                              quality={95}
+                              style={{
+                                objectFit: 'contain',
+                                objectPosition: 'center',
+                                width: 'auto',
+                                height: 'auto',
+                                maxWidth: '100%',
+                                maxHeight: '100%'
+                              }}
+                            />
+                          </div>
+                          
+                          {/* Hover overlay con nombre del cliente y indicador de link */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl flex items-end justify-center pb-4">
+                            <div className="text-center">
+                              <span className="text-white text-sm font-medium tracking-wide block">
+                                {client.name}
+                              </span>
+                              <span className="text-white/80 text-xs flex items-center justify-center mt-1">
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Visitar sitio web
+                              </span>
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                    ))}
+                  </motion.div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
 
-          {/* Stats */}
+              {/* Premium Trust Indicators */}
+              <div className="text-center mt-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}>
+                <div className="inline-flex items-center space-x-8 px-8 py-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-full border border-gray-200/30 dark:border-gray-700/30">
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium">Empresas Verificadas</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-sm font-medium">Proyectos Exitosos</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium">Confianza Garantizada</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Placeholder mientras se hidrata */}
+          {!isMounted && (
+            <div className="relative">
+              <div className="overflow-hidden">
+                <div className="flex gap-16 items-center justify-center py-10">
+                  {[
+                    { name: "Banco del Bajío", src: "/images/clients/banbajio.png" },
+                    { name: "OXXO", src: "/images/clients/oxxo.png" },
+                    { name: "Telcel", src: "/images/clients/telcel.png" },
+                    { name: "La Costeña", src: "/images/clients/la-costena.png" }
+                  ].map((client, index) => (
+                    <div
+                      key={client.name}
+                      className="flex-shrink-0"
+                    >
+                      <div className="w-40 h-20 flex items-center justify-center p-4">
+                        <OptimizedImage
+                          src={client.src}
+                          alt={`${client.name} - Cliente de GYG Arquitectos`}
+                          width={160}
+                          height={80}
+                          className="max-w-full max-h-full object-contain opacity-60 filter grayscale"
+                          quality={90}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Stats Section - Redesigned - Simple without cards for better performance */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true, amount: 0.3 }}
-            className="mt-16 text-center"
+            className="mt-20 text-center"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">98%</div>
-                <div className="text-slate-600 dark:text-slate-400">Satisfacción del Cliente</div>
-              </div>
-              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">50+</div>
-                <div className="text-slate-600 dark:text-slate-400">Empresas Fortune 500</div>
-              </div>
-              <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-2">24/7</div>
-                <div className="text-slate-600 dark:text-slate-400">Soporte Personalizado</div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+              {[
+                { 
+                  number: "98%", 
+                  label: "Satisfacción del Cliente",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  )
+                },
+                { 
+                  number: "200+", 
+                  label: "Proyectos Corporativos",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h1m4 0h1" />
+                    </svg>
+                  )
+                },
+                { 
+                  number: "24/7", 
+                  label: "Soporte Personalizado",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 109.75 9.75A9.75 9.75 0 0012 2.25z" />
+                    </svg>
+                  )
+                }
+              ].map((stat, index) => (
+                <div
+                  key={stat.label}
+                  className="text-center"
+                >
+                  {/* Simple Icon */}
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 mb-4">
+                    {stat.icon}
+                  </div>
+                  
+                  {/* Number */}
+                  <div className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2">
+                    {stat.number}
+                  </div>
+                  
+                  {/* Label */}
+                  <div className="text-gray-600 dark:text-gray-300 font-medium">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -1008,16 +1140,10 @@ export default function HomePage() {
           </motion.div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="space-y-8"
-            >
+            {/* Contact Info - Enhanced Design with Cards */}
+            <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
                   Información de Contacto
                 </h3>
                 <div className="space-y-6">
@@ -1030,7 +1156,10 @@ export default function HomePage() {
                       ),
                       title: "Email",
                       content: "contacto@garquitectos.com",
-                      subtitle: "Respuesta en menos de 24 horas"
+                      subtitle: "Respuesta en menos de 24 horas",
+                      bgColor: "bg-blue-50 dark:bg-blue-900/20",
+                      iconColor: "text-blue-600 dark:text-blue-400",
+                      borderColor: "border-blue-200 dark:border-blue-700"
                     },
                     {
                       icon: (
@@ -1040,7 +1169,10 @@ export default function HomePage() {
                       ),
                       title: "Teléfono",
                       content: "+52 (55) 1234-5678",
-                      subtitle: "Lunes a Viernes, 9:00 AM - 6:00 PM"
+                      subtitle: "Lunes a Viernes, 9:00 AM - 6:00 PM",
+                      bgColor: "bg-green-50 dark:bg-green-900/20",
+                      iconColor: "text-green-600 dark:text-green-400",
+                      borderColor: "border-green-200 dark:border-green-700"
                     },
                     {
                       icon: (
@@ -1051,45 +1183,44 @@ export default function HomePage() {
                       ),
                       title: "Ubicación",
                       content: "Polanco, Ciudad de México",
-                      subtitle: "Visitas con cita previa"
+                      subtitle: "Visitas con cita previa",
+                      bgColor: "bg-purple-50 dark:bg-purple-900/20",
+                      iconColor: "text-purple-600 dark:text-purple-400",
+                      borderColor: "border-purple-200 dark:border-purple-700"
                     }
                   ].map((item, index) => (
                     <motion.div
                       key={item.title}
-                      initial={{ opacity: 0, y: 15 }}
+                      initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.05 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      className="flex items-start space-x-4 p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      className={`${item.bgColor} ${item.borderColor} border rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group hover:scale-105`}
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-gray-600 to-slate-800 dark:from-gray-400 dark:to-gray-600 rounded-xl flex items-center justify-center text-white dark:text-black flex-shrink-0">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                          {item.title}
-                        </h4>
-                        <p className="text-slate-900 dark:text-white font-medium mb-1">
-                          {item.content}
-                        </p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          {item.subtitle}
-                        </p>
+                      <div className="flex items-start space-x-4">
+                        <div className={`w-14 h-14 ${item.bgColor} rounded-xl flex items-center justify-center ${item.iconColor} flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                          {item.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                            {item.title}
+                          </h4>
+                          <p className="text-slate-900 dark:text-white font-medium mb-1">
+                            {item.content}
+                          </p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {item.subtitle}
+                          </p>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xl"
-            >
+            {/* Contact Form - Simple Design without Card */}
+            <div className="space-y-6">
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                 Envíanos un Mensaje
               </h3>
@@ -1143,7 +1274,7 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </form>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
