@@ -239,7 +239,7 @@ export function Navbar() {
               <div className="w-8 h-8 bg-gradient-to-br from-white/90 via-white/70 to-white/50 rounded-lg flex items-center justify-center shadow-xl border border-white/30 backdrop-blur-sm">
                 <span className="text-slate-800 font-black text-sm tracking-wide">G</span>
               </div>
-              <span className="text-xl font-bold text-white drop-shadow-2xl font-inter tracking-wider ml-0.5 opacity-95 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent hover:from-blue-100 hover:via-white hover:to-blue-100 transition-all duration-500">
+              <span className="text-xl font-bold text-white drop-shadow-2xl font-raleway tracking-wider ml-0.5 opacity-95 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent hover:from-blue-100 hover:via-white hover:to-blue-100 transition-all duration-500">
                 GYG Arquitectos
               </span>
             </div>
@@ -300,7 +300,7 @@ export function Navbar() {
               >
                 <span className="text-slate-800 font-black text-base tracking-wider drop-shadow-sm">G</span>
               </motion.div>
-              <span className={`text-xl font-bold font-inter tracking-wider drop-shadow-2xl ml-2.5 opacity-95 transition-all duration-500 filter hover:brightness-110 ${
+              <span className={`text-xl font-bold font-raleway tracking-wider drop-shadow-2xl ml-2.5 opacity-95 transition-all duration-500 filter hover:brightness-110 ${
                 actualTheme === 'dark'
                   ? 'text-white bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent hover:from-blue-100 hover:via-white hover:to-blue-100'
                   : 'text-gray-900 bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 bg-clip-text text-transparent hover:from-blue-900 hover:via-gray-900 hover:to-blue-900'
@@ -328,7 +328,7 @@ export function Navbar() {
                     y: -2,
                     filter: "brightness(1.2)"
                   }}
-                  className={`font-inter font-medium text-base transition-all duration-500 relative group drop-shadow-2xl hover:drop-shadow-xl tracking-wider opacity-95 ${
+                  className={`font-raleway font-medium text-base transition-all duration-500 relative group drop-shadow-2xl hover:drop-shadow-xl tracking-wider opacity-95 ${
                     actualTheme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}
                 >
@@ -515,7 +515,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <User className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="font-inter font-medium">Mi Perfil</span>
+                            <span className="font-raleway font-medium">Mi Perfil</span>
                           </motion.div>
                           
                           {/* Opciones específicas por rol */}
@@ -530,7 +530,7 @@ export function Navbar() {
                               whileTap={{ scale: 0.98 }}
                             >
                               <Building className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                              <span className="font-inter font-medium">Mis Proyectos</span>
+                              <span className="font-raleway font-medium">Mis Proyectos</span>
                             </motion.div>
                           )}
                           
@@ -545,7 +545,7 @@ export function Navbar() {
                               whileTap={{ scale: 0.98 }}
                             >
                               <Users className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                              <span className="font-inter font-medium">Gestionar Usuarios</span>
+                              <span className="font-raleway font-medium">Gestionar Usuarios</span>
                             </motion.div>
                           )}
                           
@@ -564,7 +564,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="font-inter font-medium">Cerrar Sesión</span>
+                            <span className="font-raleway font-medium">Cerrar Sesión</span>
                           </motion.div>
                         </>
                       ) : (
@@ -583,7 +583,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="font-inter font-medium">Iniciar Sesión</span>
+                            <span className="font-raleway font-medium">Iniciar Sesión</span>
                           </motion.div>
                           
                           <motion.div 
@@ -600,7 +600,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <UserPlus className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="font-inter font-medium">Registrarme</span>
+                            <span className="font-raleway font-medium">Registrarme</span>
                           </motion.div>
                         </>
                       )}
@@ -712,7 +712,7 @@ export function Navbar() {
                       x: 5,
                       filter: "brightness(1.2)"
                     }}
-                    className={`block text-xl font-inter font-semibold transition-all duration-300 py-2 border-b w-full text-left ${
+                    className={`block text-xl font-raleway font-semibold transition-all duration-300 py-2 border-b w-full text-left ${
                       actualTheme === 'dark'
                         ? 'text-white/90 hover:text-white border-white/10 hover:border-white/30'
                         : 'text-gray-900/90 hover:text-gray-900 border-gray-200 hover:border-gray-400'
@@ -863,7 +863,7 @@ export function Navbar() {
                       <div className={`pt-4 border-t space-y-2 ${
                         actualTheme === 'dark' ? 'border-white/20' : 'border-gray-200'
                       }`}>
-                        <p className={`text-center text-sm font-inter font-semibold uppercase tracking-wider ${
+                        <p className={`text-center text-sm font-raleway font-semibold uppercase tracking-wider ${
                           actualTheme === 'dark' ? 'text-white/70' : 'text-gray-600'
                         }`}>
                           Tema
@@ -885,7 +885,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <Sun className="w-4 h-4" />
-                            <span className="font-inter font-medium">Claro</span>
+                            <span className="font-raleway font-medium">Claro</span>
                             {theme === 'light' && (
                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                             )}
@@ -906,7 +906,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <Moon className="w-4 h-4" />
-                            <span className="font-inter font-medium">Oscuro</span>
+                            <span className="font-raleway font-medium">Oscuro</span>
                             {theme === 'dark' && (
                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                             )}
@@ -927,7 +927,7 @@ export function Navbar() {
                             whileTap={{ scale: 0.98 }}
                           >
                             <Monitor className="w-4 h-4" />
-                            <span className="font-inter font-medium">Auto</span>
+                            <span className="font-raleway font-medium">Auto</span>
                             {theme === 'system' && (
                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                             )}

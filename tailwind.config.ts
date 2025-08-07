@@ -11,9 +11,17 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
+        sans: ['Raleway', 'system-ui', '-apple-system', 'sans-serif'],
+        raleway: ['Raleway', 'sans-serif'],
+        'raleway-thin': ['Raleway', 'sans-serif'],
+        'raleway-light': ['Raleway', 'sans-serif'],
         titillium: ['Titillium Web', 'sans-serif'], // Mantener por compatibilidad
+      },
+      fontWeight: {
+        'raleway-thin': '100',
+        'raleway-light': '300',
+        'raleway-regular': '400',
+        'DEFAULT': '400', // Peso por defecto para toda la fuente sans
       },
       colors: {
         primary: {

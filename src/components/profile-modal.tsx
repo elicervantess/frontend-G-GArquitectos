@@ -97,7 +97,7 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
             {icon}
           </div>
           <div className="flex-1">
-            <p className={`text-xs font-semibold uppercase tracking-wider font-inter mb-1 ${
+            <p className={`text-xs font-semibold uppercase tracking-wider font-raleway mb-1 ${
               actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
             }`}>
               {label}
@@ -109,7 +109,7 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className={`h-9 text-sm font-inter ${
+                  className={`h-9 text-sm font-raleway ${
                     actualTheme === 'dark'
                       ? 'border-gray-700 focus:border-gray-400 bg-gray-900/80'
                       : 'border-gray-200 focus:border-gray-500 bg-white/80'
@@ -145,7 +145,7 @@ const EditableField = ({ label, value, icon, onSave, disabled = false, type = 't
                 </div>
               </div>
             ) : (
-              <p className={`font-semibold font-inter text-sm ${
+              <p className={`font-semibold font-raleway text-sm ${
                 actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
               }`}>
                 {value || 'No especificado'}
@@ -210,10 +210,10 @@ const PhotoOption = ({ icon, title, description, onClick, variant = 'default', d
           {icon}
         </div>
         <div>
-          <h4 className={`font-semibold font-inter text-sm ${
+          <h4 className={`font-semibold font-raleway text-sm ${
             actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
           }`}>{title}</h4>
-          <p className={`text-xs font-inter mt-0.5 ${
+          <p className={`text-xs font-raleway mt-0.5 ${
             actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
           }`}>{description}</p>
         </div>
@@ -296,12 +296,12 @@ const PasswordVerificationModal = ({ isOpen, onClose, onVerified, userEmail }: P
                   }`} />
                 </div>
               </div>
-              <h3 className={`text-xl font-bold font-inter mb-2 ${
+              <h3 className={`text-xl font-bold font-raleway mb-2 ${
                 actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
               }`}>
                 Verificar contraseña
               </h3>
-              <p className={`text-sm font-inter ${
+              <p className={`text-sm font-raleway ${
                 actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
               }`}>
                 Por seguridad, confirma tu contraseña actual
@@ -523,12 +523,12 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess, userEmail }: ChangePa
                   }`} />
                 </div>
               </div>
-              <h3 className={`text-xl font-bold font-inter text-center mb-2 ${
+              <h3 className={`text-xl font-bold font-raleway text-center mb-2 ${
                 actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
               }`}>
                 Cambiar contraseña
               </h3>
-              <p className={`text-sm font-inter text-center ${
+              <p className={`text-sm font-raleway text-center ${
                 actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
               }`}>
                 Ingresa tu nueva contraseña (ya verificamos tu identidad)
@@ -1246,7 +1246,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <Sparkles className={`w-6 h-6 ${
                             actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                           }`} />
-                          <h2 className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent font-inter ${
+                          <h2 className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent font-raleway ${
                             actualTheme === 'dark' 
                               ? 'from-gray-100 to-gray-300' 
                               : 'from-gray-900 to-gray-700'
@@ -1254,7 +1254,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                             Mi Perfil
                           </h2>
                         </div>
-                        <p className={`text-sm font-inter ${
+                        <p className={`text-sm font-raleway ${
                           actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                         }`}>
                           Gestiona tu información personal
@@ -1300,7 +1300,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                     className="w-full h-full object-cover rounded-full"
                                   />
                                 ) : (
-                                  <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-3xl font-bold rounded-full font-inter">
+                                  <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-3xl font-bold rounded-full font-raleway">
                                     {userData?.fullName?.charAt(0) || user?.name?.charAt(0) || 'U'}
                                   </div>
                                 )}
@@ -1327,12 +1327,12 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           
                           {/* Info del usuario */}
                           <div className="text-center mt-4">
-                            <h3 className={`text-xl font-bold font-inter ${
+                            <h3 className={`text-xl font-bold font-raleway ${
                               actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                             }`}>
                               {userData?.fullName || user?.name || 'Usuario'}
                             </h3>
-                            <p className={`text-sm font-inter mt-1 ${
+                            <p className={`text-sm font-raleway mt-1 ${
                               actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                             }`}>
                               {userData?.email || user?.email}
@@ -1343,7 +1343,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 onClick={restoreOriginalPhoto}
-                                className={`mt-3 text-xs underline font-inter transition-colors duration-200 ${
+                                className={`mt-3 text-xs underline font-raleway transition-colors duration-200 ${
                                   actualTheme === 'dark' 
                                     ? 'text-gray-400 hover:text-gray-200' 
                                     : 'text-gray-600 hover:text-gray-800'
@@ -1380,7 +1380,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <div className={`mt-6 pt-6 border-t ${
                             actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
                           }`}>
-                            <h4 className={`text-sm font-semibold mb-4 font-inter flex items-center gap-2 ${
+                            <h4 className={`text-sm font-semibold mb-4 font-raleway flex items-center gap-2 ${
                               actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                             }`}>
                               <Lock className="w-4 h-4" />
@@ -1415,14 +1415,14 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                   <Key className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 text-left">
-                                  <p className={`font-semibold font-inter text-sm ${
+                                  <p className={`font-semibold font-raleway text-sm ${
                                     canChangePassword()
                                       ? actualTheme === 'dark' ? "text-gray-100" : "text-gray-900"
                                       : actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
                                   }`}>
                                     Cambiar contraseña
                                   </p>
-                                  <p className={`text-xs font-inter mt-0.5 ${
+                                  <p className={`text-xs font-raleway mt-0.5 ${
                                     canChangePassword()
                                       ? actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
                                       : actualTheme === 'dark' ? "text-gray-500" : "text-gray-400"
@@ -1448,7 +1448,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           <div className={`mt-6 pt-6 border-t ${
                             actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
                           }`}>
-                            <h4 className={`text-sm font-semibold mb-4 font-inter flex items-center gap-2 ${
+                            <h4 className={`text-sm font-semibold mb-4 font-raleway flex items-center gap-2 ${
                               actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                             }`}>
                               <Lock className="w-4 h-4" />
@@ -1468,12 +1468,12 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                                   <Shield className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1">
-                                  <p className={`font-semibold font-inter text-sm ${
+                                  <p className={`font-semibold font-raleway text-sm ${
                                     actualTheme === 'dark' ? 'text-blue-100' : 'text-blue-900'
                                   }`}>
                                     Cuenta protegida por Google
                                   </p>
-                                  <p className={`text-xs font-inter mt-0.5 ${
+                                  <p className={`text-xs font-raleway mt-0.5 ${
                                     actualTheme === 'dark' ? 'text-blue-300' : 'text-blue-700'
                                   }`}>
                                     Tu cuenta está asegurada mediante Google OAuth. No necesitas contraseña adicional.
@@ -1488,7 +1488,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         <div className={`pt-4 border-t ${
                           actualTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-100/50'
                         }`}>
-                          <p className={`text-xs text-center font-inter ${
+                          <p className={`text-xs text-center font-raleway ${
                             actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
                           }`}>
                             {isSaving ? 'Guardando cambios...' : 'Los cambios se guardarán automáticamente'}
@@ -1522,9 +1522,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
-                        <span className="text-sm font-inter">Volver</span>
+                        <span className="text-sm font-raleway">Volver</span>
                       </button>
-                      <h3 className={`text-lg font-bold font-inter ${
+                      <h3 className={`text-lg font-bold font-raleway ${
                         actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                       }`}>
                         Cambiar foto
@@ -1533,7 +1533,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     </div>
                     
                     <div className="p-6">
-                      <p className={`text-sm mb-6 text-center font-inter ${
+                      <p className={`text-sm mb-6 text-center font-raleway ${
                         actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         Elige cómo quieres actualizar tu foto de perfil
@@ -1615,9 +1615,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
-                        <span className="text-sm font-inter">Cancelar</span>
+                        <span className="text-sm font-raleway">Cancelar</span>
                       </button>
-                      <h3 className={`text-lg font-bold font-inter ${
+                      <h3 className={`text-lg font-bold font-raleway ${
                         actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                       }`}>
                         Tomar foto
@@ -1626,7 +1626,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     </div>
                     
                     <div className="p-6">
-                      <p className={`text-sm mb-4 text-center font-inter ${
+                      <p className={`text-sm mb-4 text-center font-raleway ${
                         actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         Posiciona tu rostro en el centro del marco
@@ -1656,7 +1656,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={capturePhoto}
-                          className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-8 py-3 rounded-xl font-inter font-semibold shadow-lg transition-all duration-200 flex items-center gap-2"
+                          className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-8 py-3 rounded-xl font-raleway font-semibold shadow-lg transition-all duration-200 flex items-center gap-2"
                         >
                           <Camera className="w-5 h-5" />
                           Capturar foto
@@ -1689,9 +1689,9 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         }`}
                       >
                         <ArrowLeft className="w-4 h-4" />
-                        <span className="text-sm font-inter">Volver</span>
+                        <span className="text-sm font-raleway">Volver</span>
                       </button>
-                      <h3 className={`text-lg font-bold font-inter ${
+                      <h3 className={`text-lg font-bold font-raleway ${
                         actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                       }`}>
                         Foto de perfil
@@ -1705,7 +1705,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         }`}
                       >
                         <Edit2 className="w-4 h-4" />
-                        <span className="text-sm font-inter">Editar</span>
+                        <span className="text-sm font-raleway">Editar</span>
                       </button>
                     </div>
                     
@@ -1719,7 +1719,7 @@ function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                           }`}
                         />
                       ) : (
-                        <div className="w-80 h-80 bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-6xl font-bold rounded-2xl font-inter shadow-2xl">
+                        <div className="w-80 h-80 bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center text-white text-6xl font-bold rounded-2xl font-raleway shadow-2xl">
                           {userData?.fullName?.charAt(0) || user?.name?.charAt(0) || 'U'}
                         </div>
                       )}

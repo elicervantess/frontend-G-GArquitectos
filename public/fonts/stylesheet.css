@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'LORENNA';
+    src: url('LORENNARegular.woff2') format('woff2'),
+        url('LORENNARegular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'LORENNA';
+    src: url('LORENNARegular.woff2') format('woff2'),
+        url('LORENNARegular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lorenna Script';
+    src: url('LorennaScriptRegular.woff2') format('woff2'),
+        url('LorennaScriptRegular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lorenna Script';
+    src: url('LorennaScriptRegular.woff2') format('woff2'),
+        url('LorennaScriptRegular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

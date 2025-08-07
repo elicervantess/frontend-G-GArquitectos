@@ -58,7 +58,7 @@ export function getModalStyles(actualTheme: 'light' | 'dark') {
     }`,
     
     // Label del campo
-    fieldLabel: `text-xs font-semibold uppercase tracking-wider font-inter mb-1 ${
+    fieldLabel: `text-xs font-semibold uppercase tracking-wider font-sans mb-1 ${
       actualTheme === 'dark' ? 'text-white/60' : 'text-gray-500'
     }`,
     
@@ -68,7 +68,7 @@ export function getModalStyles(actualTheme: 'light' | 'dark') {
     }`,
     
     // Input de edición
-    input: `h-9 text-sm border rounded-lg font-inter transition-all duration-200 ${
+    input: `h-9 text-sm border rounded-lg font-sans transition-all duration-200 ${
       actualTheme === 'dark'
         ? 'bg-black/60 border-white/20 focus:border-white/40 text-white placeholder-white/50'
         : 'bg-white border-gray-200 focus:border-gray-400 text-gray-900 placeholder-gray-500'

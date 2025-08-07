@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
 import { AuthProvider } from "@/contexts/AuthContext"
@@ -7,12 +6,6 @@ import { ThemeProvider } from "@/contexts/ThemeContext"
 import { UserDeletedNotification } from "@/components/user-deleted-notification"
 import { AutoLogoutNotification } from "@/components/auto-logout-notification"
 import { DeviceDebugInfo } from "@/components/dev-device-info"
-
-const inter = Inter({ 
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-inter"
-})
 
 export const metadata: Metadata = {
   title: {
@@ -122,7 +115,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="scroll-smooth">
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased">
         <ThemeProvider>
           <AuthProvider>
             <UserDeletedNotification />

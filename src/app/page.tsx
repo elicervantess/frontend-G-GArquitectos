@@ -73,7 +73,7 @@ export default function HomePage() {
   const sections = [
     { id: 'proyectos', name: 'Proyectos' }, // Hero es proyectos pero también inicio
     { id: 'nosotros', name: 'Nosotros' },
-    { id: 'clientes', name: 'Clientes' },
+    { id: 'servicios', name: 'Servicios' },
     { id: 'reseñas', name: 'Reseñas' },
     { id: 'contacto', name: 'Contacto' }
   ]
@@ -132,7 +132,7 @@ export default function HomePage() {
             } else if (scrollY >= windowHeight * 2.5) {
               newSection = 'reseñas'
             } else if (scrollY >= windowHeight * 1.5) {
-              newSection = 'clientes'
+              newSection = 'servicios'
             } else if (scrollY >= windowHeight * 0.8) {
               newSection = 'nosotros'
             }
@@ -245,7 +245,7 @@ export default function HomePage() {
                         duration: 0.6,
                         ease: "easeOut"
                       }}
-                      className="text-4xl md:text-5xl lg:text-6xl font-inter font-black text-white leading-tight"
+                      className="text-4xl md:text-5xl lg:text-6xl font-sans font-black text-white leading-tight"
                     >
                       {currentProjectData.title}
                     </motion.h1>
@@ -261,7 +261,7 @@ export default function HomePage() {
                         delay: 0.2,
                         ease: "easeOut"
                       }}
-                      className="text-lg md:text-xl text-white/90 font-inter font-medium leading-relaxed max-w-2xl"
+                      className="text-lg md:text-xl text-white/90 font-sans font-medium leading-relaxed max-w-2xl"
                     >
                       {currentProjectData.description}
                     </motion.p>
@@ -284,7 +284,7 @@ export default function HomePage() {
                     className="
                       bg-white/10 hover:bg-white/20 
                       dark:bg-white/5 dark:hover:bg-white/15
-                      text-white font-inter font-semibold
+                      text-white font-sans font-semibold
                       border border-white/20 hover:border-white/40
                       backdrop-blur-xl shadow-2xl hover:shadow-white/10
                       px-8 py-4 text-lg rounded-2xl
@@ -319,7 +319,7 @@ export default function HomePage() {
                       px-6 py-4 rounded-2xl
                       transition-all duration-300 group
                       hover:scale-105 active:scale-95
-                      font-inter font-medium
+                      font-sans font-medium
                     "
                   >
                     <span className="flex items-center">
@@ -386,7 +386,7 @@ export default function HomePage() {
               
               {/* Texto de sección */}
               <div className="text-right">
-                <p className="text-white font-inter font-semibold text-base capitalize">
+                <p className="text-white font-sans font-semibold text-base capitalize">
                   {sections.find(section => section.id === currentSection)?.name || 'Proyectos'}
                 </p>
               </div>
@@ -415,7 +415,7 @@ export default function HomePage() {
             viewport={{ once: true, amount: 0.3 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+            <h2 className="page-title">
               Sobre Nosotros
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-12">
@@ -630,7 +630,7 @@ export default function HomePage() {
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-2xl font-bold text-black dark:text-white mb-6 tracking-wide">
+                  <h3 className="page-title mb-10">
                     {item.title}
                   </h3>
                   
@@ -647,13 +647,13 @@ export default function HomePage() {
           <div className="mt-32 mb-20">
             {/* Title */}
             <div className="text-center mb-16 opacity-0 animate-fade-in-up" style={{ animationFillMode: 'forwards' }}>
-              <h2 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-6">
+              <h2 className="page-title mb-10">
                 NUESTROS VALORES
               </h2>
             </div>
 
             {/* Top Row - 5 Values Labels */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
+            <div className="valores-grid-top grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
               {[
                 { title: "ÉTICA" },
                 { title: "HONESTIDAD" },
@@ -669,7 +669,7 @@ export default function HomePage() {
                     animationFillMode: 'forwards'
                   }}
                 >
-                  <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
+                  <span className="valores-label inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
                     {value.title}
                   </span>
                 </div>
@@ -677,7 +677,7 @@ export default function HomePage() {
             </div>
 
             {/* Center Row - 5 Icon Circles */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
+            <div className="valores-grid-center grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 max-w-4xl mx-auto mb-8">
               {[
                 {
                   icon: (
@@ -725,7 +725,7 @@ export default function HomePage() {
                 >
                   {/* Icon Circle with Decorative Border */}
                   <div className="relative mx-auto">
-                    <div className="w-32 h-32 mx-auto rounded-full border-4 border-gray-200 dark:border-gray-700 flex items-center justify-center relative text-gray-600 dark:text-gray-400">
+                    <div className="valores-icon-circle w-32 h-32 mx-auto rounded-full border-4 border-gray-200 dark:border-gray-700 flex items-center justify-center relative text-gray-600 dark:text-gray-400">
                       {value.icon}
                     </div>
                   </div>
@@ -734,7 +734,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom Row - 4 Values Labels */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-3xl mx-auto">
+            <div className="valores-grid-bottom grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-3xl mx-auto">
               {[
                 { title: "RESPETO" },
                 { title: "COMPROMISO" },
@@ -749,7 +749,7 @@ export default function HomePage() {
                     animationFillMode: 'forwards'
                   }}
                 >
-                  <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
+                  <span className="valores-label inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm font-bold tracking-wide rounded-full">
                     {value.title}
                   </span>
                 </div>
@@ -759,239 +759,153 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Clientes Section */}
-      <section id="clientes" className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+      {/* Servicios Section */}
+      <section id="servicios" className="py-32 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            viewport={{ once: true, amount: 0.3 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-              Nuestros Clientes
+          {/* Header */}
+          <div className="text-center mb-24">
+            <h2 className="page-title mb-8">
+              SERVICIOS
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-12">
-              Marcas reconocidas que confían en nuestra experiencia y calidad arquitectónica
-            </p>
-          </motion.div>
+          </div>
 
-          {/* Solo mostrar el carrusel después de la hidratación */}
-          {isMounted && (
-            <>
-              {/* Premium Client Carousel - Single Row with Redirects */}
-              <div className="relative">
-                {/* Enhanced Gradient Masks */}
-                <div className="absolute left-0 top-0 w-40 h-full bg-gradient-to-r from-gray-50 via-gray-50/90 via-gray-50/60 to-transparent dark:from-slate-900 dark:via-slate-900/90 dark:via-slate-900/60 dark:to-transparent z-20" />
-                <div className="absolute right-0 top-0 w-40 h-full bg-gradient-to-l from-gray-50 via-gray-50/90 via-gray-50/60 to-transparent dark:from-slate-900 dark:via-slate-900/90 dark:via-slate-900/60 dark:to-transparent z-20" />
-                
-                {/* Main Carousel Container */}
-                <div className="overflow-hidden py-12">
-                  <motion.div
-                    className="flex gap-12 items-center"
-                    animate={{
-                      x: [0, -2400]
-                    }}
-                    transition={{
-                      x: {
-                        repeat: Infinity,
-                        repeatType: "loop",
-                        duration: 40,
-                        ease: "linear"
-                      }
-                    }}
-                    style={{ width: "max-content" }}
-                  >
-                    {/* Single row with clickable logos */}
-                    {[
-                      { name: "Banco del Bajío", src: "/images/clients/banbajio.png", website: "https://www.bb.com.mx" },
-                      { name: "Charly", src: "/images/clients/charly.png", website: "https://www.charly.mx" },
-                      { name: "Walmart", src: "/images/clients/walmart.png", website: "https://www.walmart.com.mx" },
-                      { name: "Flexi", src: "/images/clients/flexi.png", website: "https://www.flexi.com.mx" },
-                      { name: "La Costeña", src: "/images/clients/la-costena.png", website: "https://www.lacostena.com.mx" },
-                      { name: "OXXO", src: "/images/clients/oxxo.png", website: "https://www.oxxo.com" },
-                      { name: "Telmex", src: "/images/clients/telmex.png", website: "https://www.telmex.com" },
-                      { name: "Telcel", src: "/images/clients/telcel.png", website: "https://www.telcel.com" },
-                      // Duplicamos para crear loop infinito perfecto
-                      { name: "Banco del Bajío", src: "/images/clients/banbajio.png", website: "https://www.bb.com.mx" },
-                      { name: "Charly", src: "/images/clients/charly.png", website: "https://www.charly.mx" },
-                      { name: "Walmart", src: "/images/clients/walmart.png", website: "https://www.walmart.com.mx" },
-                      { name: "Flexi", src: "/images/clients/flexi.png", website: "https://www.flexi.com.mx" },
-                      { name: "La Costeña", src: "/images/clients/la-costena.png", website: "https://www.lacostena.com.mx" },
-                      { name: "OXXO", src: "/images/clients/oxxo.png", website: "https://www.oxxo.com" },
-                      { name: "Telmex", src: "/images/clients/telmex.png", website: "https://www.telmex.com" },
-                      { name: "Telcel", src: "/images/clients/telcel.png", website: "https://www.telcel.com" }
-                    ].map((client, index) => (
-                      <div
-                        key={`${client.name}-${index}`}
-                        className="flex-shrink-0 group cursor-pointer relative"
-                      >
-                        {/* Clickable Container that redirects to company website */}
-                        <a
-                          href={client.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-56 h-32 flex items-center justify-center p-8 rounded-2xl bg-white/50 dark:bg-white backdrop-blur-sm border border-gray-200/30 dark:border-gray-300/50 hover:border-gray-300/60 dark:hover:border-gray-400/70 transition-all duration-500 group-hover:transform group-hover:scale-105 group-hover:shadow-xl group-hover:bg-white/80 dark:group-hover:bg-white"
-                        >
-                          <div className="w-full h-full flex items-center justify-center">
-                            <OptimizedImage
-                              src={client.src}
-                              alt={`${client.name} - Cliente de GYG Arquitectos`}
-                              width={200}
-                              height={120}
-                              className="max-w-full max-h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
-                              quality={95}
-                              style={{
-                                objectFit: 'contain',
-                                objectPosition: 'center',
-                                width: 'auto',
-                                height: 'auto',
-                                maxWidth: '100%',
-                                maxHeight: '100%'
-                              }}
-                            />
-                          </div>
-                          
-                          {/* Hover overlay con nombre del cliente y indicador de link */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl flex items-end justify-center pb-4">
-                            <div className="text-center">
-                              <span className="text-white text-sm font-medium tracking-wide block">
-                                {client.name}
-                              </span>
-                              <span className="text-white/80 text-xs flex items-center justify-center mt-1">
-                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                                Visitar sitio web
-                              </span>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    ))}
-                  </motion.div>
+          {/* Services Layout - Two Column Clean Design */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 max-w-6xl mx-auto">
+            
+            {/* Left Column */}
+            <div className="space-y-16">
+              
+              {/* Diseño Arquitectónico */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h1m4 0h1" />
+                  </svg>
                 </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  DISEÑO ARQUITECTÓNICO
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Diseño de casas, edificios, espacios públicos y privados, tanto a nivel residencial como comercial, industrial y cultural.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
               </div>
 
-              {/* Premium Trust Indicators */}
-              <div className="text-center mt-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}>
-                <div className="inline-flex items-center space-x-8 px-8 py-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-full border border-gray-200/30 dark:border-gray-700/30">
-                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm font-medium">Empresas Verificadas</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="text-sm font-medium">Proyectos Exitosos</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm font-medium">Confianza Garantizada</span>
-                  </div>
+              {/* Diseño de Interiores */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
                 </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  DISEÑO DE INTERIORES
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Creación de espacios funcionales y estéticos, considerando la iluminación, mobiliario, distribución del espacio y materiales.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
               </div>
-            </>
-          )}
 
-          {/* Placeholder mientras se hidrata */}
-          {!isMounted && (
-            <div className="relative">
-              <div className="overflow-hidden">
-                <div className="flex gap-16 items-center justify-center py-10">
-                  {[
-                    { name: "Banco del Bajío", src: "/images/clients/banbajio.png" },
-                    { name: "OXXO", src: "/images/clients/oxxo.png" },
-                    { name: "Telcel", src: "/images/clients/telcel.png" },
-                    { name: "La Costeña", src: "/images/clients/la-costena.png" }
-                  ].map((client, index) => (
-                    <div
-                      key={client.name}
-                      className="flex-shrink-0"
-                    >
-                      <div className="w-40 h-20 flex items-center justify-center p-4">
-                        <OptimizedImage
-                          src={client.src}
-                          alt={`${client.name} - Cliente de GYG Arquitectos`}
-                          width={160}
-                          height={80}
-                          className="max-w-full max-h-full object-contain opacity-60 filter grayscale"
-                          quality={90}
-                        />
-                      </div>
-                    </div>
-                  ))}
+              {/* Arquitectura Sostenible */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
                 </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  ARQUITECTURA SOSTENIBLE
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Diseño de edificios y espacios que minimicen el impacto ambiental, utilizando materiales y tecnologías eco-amigables.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
+              </div>
+
+              {/* Artes y Diseño */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  ARTES Y DISEÑO
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Explorar otras áreas creativas relacionadas con la arquitectura, como el diseño de muebles, diseño textil o diseño gráfico.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
               </div>
             </div>
-          )}
 
-          {/* Stats Section - Redesigned - Simple without cards for better performance */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true, amount: 0.3 }}
-            className="mt-20 text-center"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
-              {[
-                { 
-                  number: "98%", 
-                  label: "Satisfacción del Cliente",
-                  icon: (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  )
-                },
-                { 
-                  number: "200+", 
-                  label: "Proyectos Corporativos",
-                  icon: (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8h1m4 0h1" />
-                    </svg>
-                  )
-                },
-                { 
-                  number: "24/7", 
-                  label: "Soporte Personalizado",
-                  icon: (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 109.75 9.75A9.75 9.75 0 0012 2.25z" />
-                    </svg>
-                  )
-                }
-              ].map((stat, index) => (
-                <div
-                  key={stat.label}
-                  className="text-center"
-                >
-                  {/* Simple Icon */}
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 mb-4">
-                    {stat.icon}
-                  </div>
-                  
-                  {/* Number */}
-                  <div className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2">
-                    {stat.number}
-                  </div>
-                  
-                  {/* Label */}
-                  <div className="text-gray-600 dark:text-gray-300 font-medium">
-                    {stat.label}
-                  </div>
+            {/* Right Column */}
+            <div className="space-y-16">
+              
+              {/* Construcción */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-              ))}
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  CONSTRUCCIÓN
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Dirección de obra, supervisión de proyectos para garantizar la máxima calidad y cumplimiento de plazos establecidos.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
+              </div>
+
+              {/* Rehabilitación y Remodelaciones */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  REHABILITACIÓN Y REMODELACIONES
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Recuperación, remodelación y mantenimiento de casas y edificios, preservando su valor cultural y arquitectónico.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
+              </div>
+
+              {/* Diseño Paisajista */}
+              <div className="text-center group">
+                <div className="w-32 h-32 mx-auto mb-8 border border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                  <svg className="w-12 h-12 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6 tracking-wide">
+                  DISEÑO PAISAJISTA
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-sm mx-auto">
+                  Creación de espacios verdes, jardines y parques, integrando la naturaleza con el entorno construido.
+                </p>
+                <button className="px-8 py-3 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 font-medium tracking-wide hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors duration-300">
+                  Learn more
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -1005,7 +919,7 @@ export default function HomePage() {
             viewport={{ once: true, amount: 0.3 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+            <h2 className="page-title mb-10">
               Lo que dicen nuestros clientes
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
@@ -1131,7 +1045,7 @@ export default function HomePage() {
             viewport={{ once: true, amount: 0.3 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+            <h2 className="page-title mb-10">
               Contáctanos
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">

@@ -1,0 +1,171 @@
+/* Estilos especiales para la tienda con navegación de secciones */
+
+.section-transition {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-tab {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.section-tab:hover::before {
+  left: 100%;
+}
+
+.product-card-section {
+  transition: all 0.3s ease;
+}
+
+.product-card-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card {
+  transition: all 0.3s ease;
+}
+
+/* Filtros móviles optimizados */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Smooth scroll para filtros en móvil */
+.mobile-filters-scroll {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+
+.mobile-filters-scroll > * {
+  scroll-snap-align: start;
+}
+
+/* Responsive optimizations para filtros */
+@media (max-width: 640px) {
+  .filter-button-mobile {
+    min-width: auto !important;
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+    min-height: 48px !important; /* Mejor área de toque */
+  }
+  
+  .filter-container-mobile {
+    gap: 0.5rem !important;
+  }
+  
+  .section-tabs-mobile {
+    width: 100% !important;
+  }
+  
+  .section-tabs-mobile button {
+    flex: 1 !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+  }
+
+  /* Grid de filtros móvil */
+  .mobile-filter-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .mobile-filter-grid button {
+    min-height: 56px !important;
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+  }
+
+  /* Controles móviles mejorados */
+  .mobile-controls {
+    padding: 0.75rem !important;
+  }
+
+  .mobile-controls button {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+}
+
+/* Mejoras para touch en móvil */
+@media (max-width: 768px) {
+  .filter-pill {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .filter-pill:active {
+    transform: scale(0.95) !important;
+  }
+}
+
+.stats-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Animación específica para el cambio de sección */
+.section-content {
+  animation: sectionSlide 0.5s ease-out;
+}
+
+@keyframes sectionSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse animation para botones activos */
+.active-section {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
